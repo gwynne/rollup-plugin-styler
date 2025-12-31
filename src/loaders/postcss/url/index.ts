@@ -44,6 +44,12 @@ export interface UrlOptions {
    */
   hash?: boolean | string;
   /**
+   * Mappings of file extensions to `assetDir` subdirectories. Dynamically affects `publicPath`.
+   * Extensions should be specified without leading dots. Files whose extensions do not appear
+   * in the mapping are placed directly in the assetDir.
+   */
+  fileExtensionPathMappings?: Record<string, string>;
+  /**
    * Provide custom resolver for URLs
    * in place of the default one
    */
@@ -60,6 +66,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
   const inline = options.inline ?? false;
   const publicPath = options.publicPath ?? "./";
   const assetDir = options.assetDir ?? ".";
+  const fileExtMappings = options.fileExtensionPathMappings ?? {};
   const resolve = options.resolve ?? resolveDefault;
   const alias = options.alias ?? {};
   const placeholder =
@@ -92,6 +99,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
 
       css.walkDecls(decl => {
         if (!isDeclWithUrl(decl)) return;
+        if (decl.prop === "behavior") return; // ignore old IE nonsense
         const parsed = valueParser(decl.value);
         walkUrls(parsed, (url, node) => {
           // Resolve aliases
@@ -169,7 +177,8 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
           node.type = "string";
           node.value = inlineFile(from, source);
         } else {
-          const unsafeTo = normalizePath(generateName(placeholder, from, source));
+          const mapping = fileExtMappings[path.extname(from).slice(1)] ?? "";
+          const unsafeTo = normalizePath(mapping, generateName(placeholder, from, source));
           let to = unsafeTo;
 
           // Avoid file overrides
@@ -181,7 +190,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
           usedNames.set(to, from);
 
           node.type = "string";
-          node.value = publicPath + (/[/\\]$/.test(publicPath) ? "" : "/") + path.basename(to);
+          node.value = path.join(publicPath, mapping, path.basename(to));
           if (urlQuery) node.value += urlQuery;
 
           to = normalizePath(assetDir, to);
