@@ -20,7 +20,8 @@ const resolve: UrlResolve = async (inputUrl, basedir) => {
   const parseOptions = { parseFragmentIdentifier: true, sort: false as const, decode: false };
   const { url, query, fragmentIdentifier } = qs.parseUrl(inputUrl, parseOptions);
   const from = await resolveAsync([url, `./${url}`], options);
-  const urlQuery = qs.stringifyUrl({ url: "", query, fragmentIdentifier }, parseOptions);
+  let urlQuery = qs.stringifyUrl({ url: "", query }, parseOptions);
+  if (fragmentIdentifier) urlQuery += `#${fragmentIdentifier}`;
   return { from, source: await fs.readFile(from), urlQuery };
 };
 
