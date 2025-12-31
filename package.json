@@ -1,6 +1,6 @@
 {
-  "name": "rollup-plugin-styler",
-  "version": "2.0.0",
+  "name": "@rollup/plugin-styler",
+  "version": "2.1.0",
   "description": "Universal Rollup plugin for styles: PostCSS, Sass, Less, Stylus and more",
   "keywords": [
     "rollup",
@@ -13,13 +13,13 @@
     "less",
     "stylus"
   ],
-  "homepage": "https://github.com/plumelo/rollup-plugin-styler#readme",
+  "homepage": "https://github.com/gwynne/rollup-plugin-styler",
   "bugs": {
-    "url": "https://github.com/plumelo/rollup-plugin-styler/issues"
+    "url": "https://github.com/gwynne/rollup-plugin-styler/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/plumelo/rollup-plugin-styler.git"
+    "url": "git+https://github.com/gwynne/rollup-plugin-styler.git"
   },
   "license": "MIT",
   "author": "Anton Kudryavtsev <boblobl4@gmail.com>",
