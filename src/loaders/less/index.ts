@@ -21,7 +21,11 @@ const loader: Loader<LESSLoaderOptions> = {
       ...options,
       plugins,
       filename: this.id,
-      sourceMap: { outputSourceFiles: true, sourceMapBasepath: path.dirname(this.id) },
+      sourceMap: {
+        outputSourceFiles: true,
+        sourceMapBasepath: path.dirname(this.id),
+        disableSourcemapAnnotation: true,
+      } as Record<string, unknown>,
     });
 
     const deps = res.imports;
