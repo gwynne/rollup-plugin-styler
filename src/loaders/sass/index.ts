@@ -2,7 +2,15 @@ import { normalizePath } from "../../utils/path";
 import { Loader } from "../types";
 import loadSass from "./load";
 import { importer, importerSync } from "./importer";
-import { Options, PublicOptions, Result } from "./types";
+import {
+  Importer,
+  FileImporter,
+  NodePackageImporter,
+  Options,
+  PublicOptions,
+  Result,
+} from "./types";
+import { pathToFileURL, fileURLToPath } from "url";
 
 /** Options for Sass loader */
 export interface SASSLoaderOptions extends Record<string, unknown>, PublicOptions {
@@ -17,54 +25,44 @@ const loader: Loader<SASSLoaderOptions> = {
   test: /\.(sass|scss)$/i,
   async process({ code, map }) {
     const options = { ...this.options };
-    options.silenceDeprecations = [...(options.silenceDeprecations ?? []), "legacy-js-api"];
     const [sass, type] = await loadSass(options.impl);
     const sync = options.sync ?? type !== "node-sass";
-    const importers = [sync ? importerSync : importer];
+    const importers: (NodePackageImporter | Importer | FileImporter)[] = [
+      sync ? importerSync : importer,
+    ];
 
-    if (options.data) code = options.data + code;
+    if (options.importers) importers.push(...options.importers);
 
-    if (options.importer)
-      Array.isArray(options.importer)
-        ? importers.push(...options.importer)
-        : importers.push(options.importer);
-
-    const render = async (options: Options): Promise<Result> =>
-      new Promise((resolve, reject) => {
-        if (sync) resolve(sass.renderSync(options as Options<"sync">));
-        else sass.render(options, (err, css) => (err ? reject(err) : resolve(css!)));
-      });
+    const render = async (options: Options): Promise<Result> => {
+      return sync
+        ? new Promise(resolve => resolve(sass.compileString(code, options as Options<"sync">)))
+        : sass.compileStringAsync(code, options);
+    };
 
     // Remove non-Sass options
     delete options.impl;
     delete options.sync;
 
-    // node-sass won't produce sourcemaps if the `data`
-    // option is used and `sourceMap` option is not a string.
-    //
-    // In case it is a string, `sourceMap` option
-    // should be a path where the sourcemap is written.
-    //
-    // But since we're using the `data` option,
-    // the sourcemap will not actually be written, but
-    // all paths in sourcemap's sources will be relative to that path.
     const res = await render({
       ...options,
-      file: this.id,
-      data: code,
-      indentedSyntax: /\.sass$/i.test(this.id),
-      sourceMap: this.id,
-      omitSourceMapUrl: true,
-      sourceMapContents: true,
-      importer: importers,
+      url: pathToFileURL(this.id),
+      syntax: /\.sass$/i.test(this.id) ? "indented" : "scss",
+      sourceMap: true,
+      sourceMapIncludeSources: true,
+      importers: importers,
     });
 
-    const deps = res.stats.includedFiles;
+    const deps = res.loadedUrls.map(u => fileURLToPath(u));
     for (const dep of deps) this.deps.add(normalizePath(dep));
 
+    if (res.sourceMap) {
+      res.sourceMap.sources = res.sourceMap.sources.map(s =>
+        s.startsWith("file:///") ? fileURLToPath(s) : s,
+      );
+    }
     return {
-      code: Buffer.from(res.css).toString(),
-      map: res.map ? Buffer.from(res.map).toString() : map,
+      code: res.css,
+      map: res.sourceMap ? JSON.stringify(res.sourceMap) : map,
     };
   },
 };

@@ -6,7 +6,7 @@ import postcss from 'postcss';
 import { SourceMapConsumer, SourceMapGenerator } from 'source-map-js';
 import resolver from 'resolve';
 import { resolve as resolve$3, legacy } from 'resolve.exports';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { cosmiconfig } from 'cosmiconfig';
 import { createRequire } from 'node:module';
@@ -1037,45 +1037,58 @@ function normalizeUrl(url) {
 
 const extensions$1 = [".scss", ".sass", ".css"];
 const conditions = ["sass", "style"];
-const importer$1 = (url, importer, done) => {
-  const finalize = id => done({
-    file: id.replace(/\.css$/i, "")
-  });
-  const next = () => done(null);
-  if (!isModule(url)) return next();
-  const moduleUrl = normalizeUrl(url);
-  const partialUrl = getUrlOfPartial(moduleUrl);
-  const options = {
-    caller: "Sass importer",
-    basedirs: [path.dirname(importer)],
-    extensions: extensions$1,
-    packageFilter: packageFilterBuilder({
-      conditions
-    })
-  };
-  // Give precedence to importing a partial
-  resolveAsync([partialUrl, moduleUrl], options).then(finalize).catch(next);
+const importer$1 = {
+  async findFileUrl(url, context) {
+    if (!isModule(url)) {
+      return null;
+    }
+    const moduleUrl = normalizeUrl(url);
+    const partialUrl = getUrlOfPartial(moduleUrl);
+    const options = {
+      caller: "Sass importer",
+      basedirs: [path.dirname(context.containingUrl?.pathname ?? "./")],
+      extensions: extensions$1,
+      packageFilter: packageFilterBuilder({
+        conditions
+      })
+    };
+    // Give precedence to importing a partial
+    try {
+      const resolved = await resolveAsync([partialUrl, moduleUrl], options);
+      if (!resolved) {
+        return null;
+      }
+      return pathToFileURL(resolved.replace(/\.css$/i, ""));
+    } catch {
+      return null;
+    }
+  }
 };
-const finalize = id => ({
-  file: id.replace(/\.css$/i, "")
-});
-const importerSync = (url, importer) => {
-  if (!isModule(url)) return null;
-  const moduleUrl = normalizeUrl(url);
-  const partialUrl = getUrlOfPartial(moduleUrl);
-  const options = {
-    caller: "Sass importer",
-    basedirs: [path.dirname(importer)],
-    extensions: extensions$1,
-    packageFilter: packageFilterBuilder({
-      conditions
-    })
-  };
-  // Give precedence to importing a partial
-  try {
-    return finalize(resolveSync([partialUrl, moduleUrl], options));
-  } catch {
-    return null;
+const importerSync = {
+  findFileUrl(url, context) {
+    if (!isModule(url)) {
+      return null;
+    }
+    const moduleUrl = normalizeUrl(url);
+    const partialUrl = getUrlOfPartial(moduleUrl);
+    const options = {
+      caller: "Sass importer",
+      basedirs: [path.dirname(context.containingUrl?.pathname ?? "./")],
+      extensions: extensions$1,
+      packageFilter: packageFilterBuilder({
+        conditions
+      })
+    };
+    // Give precedence to importing a partial
+    try {
+      const resolved = resolveSync([partialUrl, moduleUrl], options);
+      if (!resolved) {
+        return null;
+      }
+      return pathToFileURL(resolved.replace(/\.css$/i, ""));
+    } catch {
+      return null;
+    }
   }
 };
 
@@ -1089,15 +1102,14 @@ const loader$2 = {
     const options = {
       ...this.options
     };
-    options.silenceDeprecations = [...(options.silenceDeprecations ?? []), "legacy-js-api"];
     const [sass, type] = await loadSass(options.impl);
     const sync = options.sync ?? type !== "node-sass";
     const importers = [sync ? importerSync : importer$1];
     if (options.data) code = options.data + code;
-    if (options.importer) Array.isArray(options.importer) ? importers.push(...options.importer) : importers.push(options.importer);
-    const render = async options => new Promise((resolve, reject) => {
-      if (sync) resolve(sass.renderSync(options));else sass.render(options, (err, css) => err ? reject(err) : resolve(css));
-    });
+    if (options.importers) importers.push(...options.importers);
+    const render = async options => {
+      if (sync) return new Promise(resolve => resolve(sass.compileString(code, options)));else return sass.compileStringAsync(code, options);
+    };
     // Remove non-Sass options
     delete options.impl;
     delete options.sync;
@@ -1109,22 +1121,23 @@ const loader$2 = {
     //
     // But since we're using the `data` option,
     // the sourcemap will not actually be written, but
-    // all paths in sourcemap's sources will be relative to that path.
+    // all paths in sourcemap's sources will be relative to that path.)
     const res = await render({
       ...options,
-      file: this.id,
-      data: code,
-      indentedSyntax: /\.sass$/i.test(this.id),
-      sourceMap: this.id,
-      omitSourceMapUrl: true,
-      sourceMapContents: true,
-      importer: importers
+      url: pathToFileURL(this.id),
+      syntax: /\.sass$/i.test(this.id) ? "indented" : "scss",
+      sourceMap: true,
+      sourceMapIncludeSources: true,
+      importers: importers
     });
-    const deps = res.stats.includedFiles;
+    const deps = res.loadedUrls.map(u => fileURLToPath(u));
     for (const dep of deps) this.deps.add(normalizePath(dep));
+    if (res.sourceMap) {
+      res.sourceMap.sources = res.sourceMap.sources.map(s => s.startsWith("file:///") ? fileURLToPath(s) : s);
+    }
     return {
-      code: Buffer.from(res.css).toString(),
-      map: res.map ? Buffer.from(res.map).toString() : map
+      code: res.css,
+      map: res.sourceMap ? JSON.stringify(res.sourceMap) : map
     };
   }
 };
@@ -1220,7 +1233,8 @@ const loader = {
       filename: this.id,
       sourceMap: {
         outputSourceFiles: true,
-        sourceMapBasepath: path.dirname(this.id)
+        sourceMapBasepath: path.dirname(this.id),
+        disableSourcemapAnnotation: true
       }
     });
     const deps = res.imports;
@@ -1249,7 +1263,8 @@ class Loaders {
   constructor(options) {
     this.use = new Map(options.use.reverse());
     this.test = file => options.extensions.some(ext => file.toLowerCase().endsWith(ext));
-    this.add(loader$4, loader$3, loader$2, loader, loader$1);
+    this.add(loader$4);
+    this.add(loader$3, loader$2, loader, loader$1);
     if (options.loaders) this.add(...options.loaders);
   }
   add(...loaders) {

@@ -38,7 +38,8 @@ export default class Loaders {
   constructor(options: LoadersOptions) {
     this.use = new Map(options.use.reverse());
     this.test = (file): boolean => options.extensions.some(ext => file.toLowerCase().endsWith(ext));
-    this.add(postcssLoader, sourcemapLoader, sassLoader, lessLoader, stylusLoader);
+    this.add(postcssLoader);
+    this.add(sourcemapLoader, sassLoader, lessLoader, stylusLoader);
     if (options.loaders) this.add(...options.loaders);
   }
 
@@ -68,7 +69,7 @@ export default class Loaders {
       const loader = this.loaders.get(name);
       if (!loader) continue;
       const ctx: LoaderContext = { ...context, options };
-      //eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
       if (loader.alwaysProcess || matchFile(ctx.id, loader.test)) {
         payload = (await workQueue.add(loader.process.bind(ctx, payload)))!;
       }

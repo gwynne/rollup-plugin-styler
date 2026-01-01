@@ -6,7 +6,7 @@ import * as rollup from 'rollup';
 import { Plugin } from 'rollup';
 import * as postcss from 'postcss';
 import { Options as Options$1 } from 'cssnano';
-import { LegacyOptions } from 'sass/types/legacy/options';
+import { StringOptions } from 'sass/types/options';
 import { RawSourceMap } from 'source-map-js';
 
 /** File resolved by `@import` resolver */
@@ -196,7 +196,7 @@ interface SourceMapOptions {
 }
 
 type Type = "sync" | "async";
-interface PublicOptions<T extends Type = Type> extends Pick<LegacyOptions<T>, "data" | "includePaths" | "indentType" | "indentWidth" | "importer" | "linefeed" | "outputStyle" | "quietDeps" | "silenceDeprecations"> {
+interface PublicOptions<T extends Type = Type> extends Pick<StringOptions<T>, "url" | "charset" | "loadPaths" | "importers" | "style" | "syntax" | "quietDeps" | "fatalDeprecations" | "futureDeprecations" | "silenceDeprecations" | "verbose"> {
 }
 
 /** Options for Sass loader */

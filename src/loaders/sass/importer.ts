@@ -1,43 +1,62 @@
-import path from "path";
+import path from "node:path";
 import { packageFilterBuilder, resolveAsync, resolveSync } from "../../utils/resolve";
 import { getUrlOfPartial, isModule, normalizeUrl } from "../../utils/url";
-import { Data, AsyncImporter, SyncImporter } from "./types";
+import { CanonicalizeContext, AsyncFileImporter, SyncFileImporter } from "./types";
+import { pathToFileURL } from "url";
 
 const extensions = [".scss", ".sass", ".css"];
 const conditions = ["sass", "style"];
 
-export const importer: AsyncImporter = (url, importer, done): void => {
-  const finalize = (id: string): void => done({ file: id.replace(/\.css$/i, "") });
-  const next = (): void => done(null);
+export const importer: AsyncFileImporter = {
+  async findFileUrl(url: string, context: CanonicalizeContext): Promise<URL | null> {
+    if (!isModule(url)) {
+      return null;
+    }
+    const moduleUrl = normalizeUrl(url);
+    const partialUrl = getUrlOfPartial(moduleUrl);
+    const options = {
+      caller: "Sass importer",
+      basedirs: [path.dirname(context.containingUrl?.pathname ?? "./")],
+      extensions,
+      packageFilter: packageFilterBuilder({ conditions }),
+    };
+    // Give precedence to importing a partial
+    try {
+      const resolved = await resolveAsync([partialUrl, moduleUrl], options);
 
-  if (!isModule(url)) return next();
-  const moduleUrl = normalizeUrl(url);
-  const partialUrl = getUrlOfPartial(moduleUrl);
-  const options = {
-    caller: "Sass importer",
-    basedirs: [path.dirname(importer)],
-    extensions,
-    packageFilter: packageFilterBuilder({ conditions }),
-  };
-  // Give precedence to importing a partial
-  resolveAsync([partialUrl, moduleUrl], options).then(finalize).catch(next);
+      if (!resolved) {
+        return null;
+      }
+      return pathToFileURL(resolved.replace(/\.css$/i, ""));
+    } catch {
+      return null;
+    }
+  },
 };
 
-const finalize = (id: string): Data => ({ file: id.replace(/\.css$/i, "") });
-export const importerSync: SyncImporter = (url, importer): Data => {
-  if (!isModule(url)) return null;
-  const moduleUrl = normalizeUrl(url);
-  const partialUrl = getUrlOfPartial(moduleUrl);
-  const options = {
-    caller: "Sass importer",
-    basedirs: [path.dirname(importer)],
-    extensions,
-    packageFilter: packageFilterBuilder({ conditions }),
-  };
-  // Give precedence to importing a partial
-  try {
-    return finalize(resolveSync([partialUrl, moduleUrl], options));
-  } catch {
-    return null;
-  }
+export const importerSync: SyncFileImporter = {
+  findFileUrl(url: string, context: CanonicalizeContext): URL | null {
+    if (!isModule(url)) {
+      return null;
+    }
+    const moduleUrl = normalizeUrl(url);
+    const partialUrl = getUrlOfPartial(moduleUrl);
+    const options = {
+      caller: "Sass importer",
+      basedirs: [path.dirname(context.containingUrl?.pathname ?? "./")],
+      extensions,
+      packageFilter: packageFilterBuilder({ conditions }),
+    };
+    // Give precedence to importing a partial
+    try {
+      const resolved = resolveSync([partialUrl, moduleUrl], options);
+
+      if (!resolved) {
+        return null;
+      }
+      return pathToFileURL(resolved.replace(/\.css$/i, ""));
+    } catch {
+      return null;
+    }
+  },
 };

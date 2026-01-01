@@ -8,7 +8,6 @@ import { humanlizePath } from "../src/utils/path";
 import { litCss } from "rollup-plugin-lit-css";
 
 import { fixture, validateMany, write } from "./helpers";
-import type { Data } from "../src/loaders/sass/types";
 
 beforeAll(async () => fs.remove(fixture("dist")));
 
@@ -464,10 +463,24 @@ validateMany("sass", [
     options: {
       sass: {
         sync: false,
-        importer(url, _, done): void {
-          if (url === "~modularvirtualimport") done({ contents: ".modularvirtual{color:blue}" });
-          else done({ contents: ".virtual{color:red}" });
-        },
+        importers: [
+          {
+            // eslint-disable-next-line @typescript-eslint/require-await
+            async canonicalize(url) {
+              return new URL(`virtual:${url}`);
+            },
+            // eslint-disable-next-line @typescript-eslint/require-await
+            async load(canonicalUrl) {
+              return {
+                syntax: "scss",
+                contents:
+                  canonicalUrl.toString() === "virtual:~modularvirtualimport"
+                    ? ".modularvirtual{color:blue}"
+                    : ".virtual{color:red}",
+              };
+            },
+          },
+        ],
       },
     },
   },
@@ -477,10 +490,22 @@ validateMany("sass", [
     options: {
       sass: {
         sync: true,
-        importer(url: string): Data {
-          if (url === "~modularvirtualimport") return { contents: ".modularvirtual{color:blue}" };
-          return { contents: ".virtual{color:red}" };
-        },
+        importers: [
+          {
+            canonicalize(url) {
+              return new URL(`virtual:${url}`);
+            },
+            load(canonicalUrl) {
+              return {
+                syntax: "scss",
+                contents:
+                  canonicalUrl.toString() === "virtual:~modularvirtualimport"
+                    ? ".modularvirtual{color:blue}"
+                    : ".virtual{color:red}",
+              };
+            },
+          },
+        ],
       },
     },
   },
