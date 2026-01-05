@@ -916,7 +916,7 @@ const loader$4 = {
     };
     const saferId = id => safeId(id, path.basename(this.id));
     const modulesVarName = saferId("modules");
-    const output = [`export var ${cssVarName} = ${JSON.stringify(res.css)};`];
+    const output = options.inject ? [`export var ${cssVarName} = ${JSON.stringify(res.css)};`] : [];
     const dts = [`export var ${cssVarName}: string;`];
     if (options.namedExports) {
       const getClassName = typeof options.namedExports === "function" ? options.namedExports : getClassNameDefault;
@@ -968,15 +968,14 @@ const loader$4 = {
           output.push(`var ${modulesVarName} = {${getters}};`);
         }
       }
-    }
-    if (!options.inject) output.push(`var ${modulesVarName} = ${JSON.stringify(modulesExports)};`);
-    const defaultExport = `export default ${supportModules ? modulesVarName : cssVarName};`;
-    output.push(defaultExport);
-    if (options.dts && (await fs.pathExists(this.id))) {
-      if (supportModules) dts.push(`interface ModulesExports ${JSON.stringify(modulesExports)}`, typeof options.inject === "object" && options.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "", `declare const ${modulesVarName}: ModulesExports;`);
-      dts.push(defaultExport);
-      await fs.writeFile(`${this.id}.d.ts`, dts.filter(Boolean).join("\n"));
-    }
+      const defaultExport = `export default ${supportModules ? modulesVarName : cssVarName};`;
+      output.push(defaultExport);
+      if (options.dts && (await fs.pathExists(this.id))) {
+        if (supportModules) dts.push(`interface ModulesExports ${JSON.stringify(modulesExports)}`, typeof options.inject === "object" && options.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "", `declare const ${modulesVarName}: ModulesExports;`);
+        dts.push(defaultExport);
+        await fs.writeFile(`${this.id}.d.ts`, dts.filter(Boolean).join("\n"));
+      }
+    } //else output.push(`var ${modulesVarName} = ${JSON.stringify(modulesExports)};`);
     return {
       code: output.filter(Boolean).join("\n"),
       map,
@@ -1000,7 +999,7 @@ const loader$3 = {
   }
 };
 
-const ids = ["sass", "node-sass"];
+const ids = ["sass-embedded", "sass"];
 const idsFmt = arrayFmt(ids);
 async function loadSass (impl) {
   // Loading provided implementation
@@ -1108,23 +1107,13 @@ const loader$2 = {
     const [sass, type] = await loadSass(options.impl);
     const sync = options.sync ?? type !== "node-sass";
     const importers = [sync ? importerSync : importer$1];
-    if (options.data) code = options.data + code;
     if (options.importers) importers.push(...options.importers);
     const render = async options => {
-      if (sync) return new Promise(resolve => resolve(sass.compileString(code, options)));else return sass.compileStringAsync(code, options);
+      return sync ? new Promise(resolve => resolve(sass.compileString(code, options))) : sass.compileStringAsync(code, options);
     };
     // Remove non-Sass options
     delete options.impl;
     delete options.sync;
-    // node-sass won't produce sourcemaps if the `data`
-    // option is used and `sourceMap` option is not a string.
-    //
-    // In case it is a string, `sourceMap` option
-    // should be a path where the sourcemap is written.
-    //
-    // But since we're using the `data` option,
-    // the sourcemap will not actually be written, but
-    // all paths in sourcemap's sources will be relative to that path.)
     const res = await render({
       ...options,
       url: node_url.pathToFileURL(this.id),
@@ -1301,7 +1290,6 @@ class Loaders {
         ...context,
         options
       };
-      //eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       if (loader.alwaysProcess || matchFile(ctx.id, loader.test)) {
         payload = await workQueue.add(loader.process.bind(ctx, payload));
       }
@@ -1457,7 +1445,6 @@ var index = (options = {}) => {
       return hashable.join(":");
     },
     async generateBundle(opts, bundle) {
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
       if (extracted.length === 0 || !(opts.dir || opts.file)) return;
       const dir = opts.dir ?? path.dirname(opts.file);
       const chunks = Object.values(bundle).filter(c => c.type === "chunk");
