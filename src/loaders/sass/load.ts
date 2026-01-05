@@ -1,7 +1,7 @@
 import arrayFmt from "../../utils/array-fmt";
 import type { SassModule } from "./types";
 
-const ids = ["sass", "node-sass"];
+const ids = ["sass-embedded", "sass"];
 const idsFmt = arrayFmt(ids);
 export default async function (impl?: string): Promise<readonly [SassModule, string]> {
   // Loading provided implementation
