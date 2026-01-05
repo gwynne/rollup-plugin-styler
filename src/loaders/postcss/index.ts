@@ -104,17 +104,14 @@ const loader: Loader<PostCSSLoaderOptions> = {
           this.warn({ plugin: msg.plugin, message: msg.text as string });
           break;
         }
-
         case "icss": {
           Object.assign(modulesExports, msg.export as Record<string, string>);
           break;
         }
-
         case "dependency": {
           this.deps.add(normalizePath(msg.file as string));
           break;
         }
-
         case "asset": {
           this.assets.set(msg.to as string, msg.source as Uint8Array);
           break;
@@ -139,7 +136,7 @@ const loader: Loader<PostCSSLoaderOptions> = {
     const saferId = (id: string): string => safeId(id, path.basename(this.id));
     const modulesVarName = saferId("modules");
 
-    const output = [`export var ${cssVarName} = ${JSON.stringify(res.css)};`];
+    const output = options.inject ? [`export var ${cssVarName} = ${JSON.stringify(res.css)};`] : [];
     const dts = [`export var ${cssVarName}: string;`];
 
     if (options.namedExports) {
@@ -205,28 +202,25 @@ const loader: Loader<PostCSSLoaderOptions> = {
           output.push(`var ${modulesVarName} = {${getters}};`);
         }
       }
-    }
+      const defaultExport = `export default ${supportModules ? modulesVarName : cssVarName};`;
+      output.push(defaultExport);
 
-    if (!options.inject) output.push(`var ${modulesVarName} = ${JSON.stringify(modulesExports)};`);
+      if (options.dts && (await fs.pathExists(this.id))) {
+        if (supportModules)
+          dts.push(
+            `interface ModulesExports ${JSON.stringify(modulesExports)}`,
 
-    const defaultExport = `export default ${supportModules ? modulesVarName : cssVarName};`;
-    output.push(defaultExport);
+            typeof options.inject === "object" && options.inject.treeshakeable
+              ? `interface ModulesExports {inject:()=>void}`
+              : "",
 
-    if (options.dts && (await fs.pathExists(this.id))) {
-      if (supportModules)
-        dts.push(
-          `interface ModulesExports ${JSON.stringify(modulesExports)}`,
+            `declare const ${modulesVarName}: ModulesExports;`,
+          );
 
-          typeof options.inject === "object" && options.inject.treeshakeable
-            ? `interface ModulesExports {inject:()=>void}`
-            : "",
-
-          `declare const ${modulesVarName}: ModulesExports;`,
-        );
-
-      dts.push(defaultExport);
-      await fs.writeFile(`${this.id}.d.ts`, dts.filter(Boolean).join("\n"));
-    }
+        dts.push(defaultExport);
+        await fs.writeFile(`${this.id}.d.ts`, dts.filter(Boolean).join("\n"));
+      }
+    } //else output.push(`var ${modulesVarName} = ${JSON.stringify(modulesExports)};`);
 
     return { code: output.filter(Boolean).join("\n"), map, extracted };
   },
