@@ -49,7 +49,7 @@ const loader: Loader<SASSLoaderOptions> = {
       url: pathToFileURL(this.id),
       syntax: /\.sass$/i.test(this.id) ? "indented" : "scss",
       sourceMap: true,
-      sourceMapIncludeSources: true,
+      sourceMapIncludeSources: options.sourceMapIncludeSources ?? true,
       importers: importers,
     });
 

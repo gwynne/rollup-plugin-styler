@@ -27,6 +27,7 @@ export interface PublicOptions<T extends Type = Type> extends Pick<
   | "quietDeps"
   | "fatalDeprecations"
   | "futureDeprecations"
+  | "sourceMapIncludeSources"
   | "silenceDeprecations"
   | "verbose"
 > {}
