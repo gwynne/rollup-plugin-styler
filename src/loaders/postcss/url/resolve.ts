@@ -1,6 +1,6 @@
 import fs from "fs-extra";
 import qs from "query-string";
-import { resolveAsync } from "../../../utils/resolve";
+import { resolveAsync } from "../../../utils/resolve.js";
 
 /** File resolved by URL resolver */
 export interface UrlFile {

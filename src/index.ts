@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-import path from "path";
-import { Plugin, OutputChunk, OutputAsset } from "rollup";
+import path from "node:path";
 import { createFilter } from "@rollup/pluginutils";
 import cssnano from "cssnano";
-import { LoaderContext, Extracted } from "./loaders/types";
-import { ExtractedData, Options, PostCSSLoaderOptions } from "./types";
-import Loaders from "./loaders";
-import { humanlizePath, normalizePath, isAbsolutePath, isRelativePath } from "./utils/path";
-import { mm } from "./utils/sourcemap";
-import concat from "./utils/concat";
+import type { OutputAsset, OutputChunk, Plugin } from "rollup";
+import Loaders from "./loaders/index.js";
+import type { Extracted, LoaderContext } from "./loaders/types.js";
+import type { ExtractedData, Options, PostCSSLoaderOptions } from "./types.js";
+import concat from "./utils/concat.js";
 import {
-  inferOption,
-  inferModeOption,
-  inferSourceMapOption,
-  inferHandlerOption,
-  ensureUseOption,
   ensurePCSSOption,
   ensurePCSSPlugins,
-} from "./utils/options";
+  ensureUseOption,
+  inferHandlerOption,
+  inferModeOption,
+  inferOption,
+  inferSourceMapOption,
+} from "./utils/options.js";
+import { humanlizePath, isAbsolutePath, isRelativePath, normalizePath } from "./utils/path.js";
+import { mm } from "./utils/sourcemap.js";
 
 export default (options: Options = {}): Plugin => {
   const isIncluded = createFilter(options.include, options.exclude);

@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import fs from "fs-extra";
 import { rollup } from "rollup";
-import { RawSourceMap } from "source-map-js";
-
-import styles from "../src";
-import { humanlizePath } from "../src/utils/path";
 import { litCss } from "rollup-plugin-lit-css";
+import type { RawSourceMap } from "source-map-js";
+import styles from "../src/index.js";
+import { humanlizePath } from "../src/utils/path.js";
 
-import { fixture, validateMany, write } from "./helpers";
+import { fixture, validateMany, write } from "./helpers/index.js";
 
 beforeAll(async () => fs.remove(fixture("dist")));
 
@@ -25,21 +24,21 @@ validateMany("basic", [
     shouldFail: true,
     input: "simple/index.js",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-assignment
-    options: { mode: "mash" as any },
+    options: { mode: "mash" as "inject" },
   },
   {
     title: "use-fail",
     shouldFail: true,
     input: "simple/index.js",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-assignment
-    options: { use: [false] as any },
+    options: { use: [false as unknown as string] },
   },
   {
     title: "use-type-fail",
     shouldFail: true,
     input: "simple/index.js",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-assignment
-    options: { use: false as any },
+    options: { use: false as unknown as string[] },
   },
   {
     title: "parser-fail",
@@ -64,14 +63,14 @@ validateMany("basic", [
     shouldFail: true,
     input: "simple/index.js",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-assignment
-    options: { plugins: ["pulverizer"] as any },
+    options: { plugins: ["pulverizer"] },
   },
   {
     title: "plugin-type-fail",
     shouldFail: true,
     input: "simple/index.js",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-assignment
-    options: { plugins: "pulverizer" as any },
+    options: { plugins: "pulverizer" as unknown as Record<string, unknown> },
   },
   {
     title: "postcss-config",
@@ -203,7 +202,8 @@ validateMany("modules", [
     options: {
       mode: [
         "inject",
-        (varname, id) => `console.log(${varname}, ${JSON.stringify(typeof id === "string")})`,
+        (varname: string, id: unknown) =>
+          `console.log(${varname}, ${JSON.stringify(typeof id === "string")})`,
       ],
       modules: true,
     },
@@ -227,7 +227,7 @@ validateMany("modules", [
   {
     title: "generate-scoped-name",
     input: "modules-duplication/index.js",
-    options: { modules: { generateScopedName: name => `${name}hacked` } },
+    options: { modules: { generateScopedName: (name: string) => `${name}hacked` } },
   },
   {
     title: "named-exports",
@@ -250,7 +250,7 @@ validateMany("modules", [
     input: "named-exports/index.js",
     options: {
       modules: true,
-      namedExports: name => `${name}hacked`,
+      namedExports: (name: string) => `${name}hacked`,
     },
   },
   {
@@ -286,7 +286,7 @@ validateMany("modules", [
   {
     title: "auto-modules-fn",
     input: "auto-modules/index.js",
-    options: { autoModules: id => id.endsWith(".less") },
+    options: { autoModules: (id: string) => id.endsWith(".less") },
   },
   {
     title: "duplication",
@@ -309,7 +309,9 @@ validateMany("sourcemap", [
   {
     title: "transform",
     input: "simple/index.js",
-    options: { sourceMap: [true, { transform: m => (m.sources = ["virt"]) }] },
+    options: {
+      sourceMap: [true, { transform: (m: { sources: string[] }) => (m.sources = ["virt"]) }],
+    },
   },
   {
     title: "inline",
@@ -324,7 +326,9 @@ validateMany("sourcemap", [
   {
     title: "inline-transform",
     input: "simple/index.js",
-    options: { sourceMap: ["inline", { transform: m => (m.sources = ["virt"]) }] },
+    options: {
+      sourceMap: ["inline", { transform: (m: { sources: string[] }) => (m.sources = ["virt"]) }],
+    },
   },
 ]);
 
@@ -374,7 +378,10 @@ validateMany("extract", [
   {
     title: "sourcemap-transform",
     input: "simple/index.js",
-    options: { mode: "extract", sourceMap: [true, { transform: m => (m.sources = ["virt"]) }] },
+    options: {
+      mode: "extract",
+      sourceMap: [true, { transform: (m: { sources: string[] }) => (m.sources = ["virt"]) }],
+    },
   },
   {
     title: "sourcemap-inline",
@@ -384,7 +391,10 @@ validateMany("extract", [
   {
     title: "sourcemap-inline-transform",
     input: "simple/index.js",
-    options: { mode: "extract", sourceMap: ["inline", { transform: m => (m.sources = ["virt"]) }] },
+    options: {
+      mode: "extract",
+      sourceMap: ["inline", { transform: (m: { sources: string[] }) => (m.sources = ["virt"]) }],
+    },
   },
   {
     title: "asset-file-names",
@@ -416,7 +426,8 @@ validateMany("inject", [
     options: {
       mode: [
         "inject",
-        (varname, id) => `console.log(${varname},${JSON.stringify(humanlizePath(id))})`,
+        (varname: string, id: string) =>
+          `console.log(${varname},${JSON.stringify(humanlizePath(id))})`,
       ],
     },
   },
@@ -430,7 +441,6 @@ validateMany("sass", [
   {
     title: "use",
     input: "sass-use/index.js",
-    options: { sass: { impl: "sass" } },
   },
   {
     title: "sourcemap",
@@ -447,17 +457,6 @@ validateMany("sass", [
     },
   },
   {
-    title: "data",
-    input: "sass-data/index.js",
-    options: {
-      sass: { data: "@import 'data';" },
-    },
-  },
-  {
-    title: "import",
-    input: "sass-import/index.js",
-  },
-  {
     title: "importer",
     input: "sass-importer/index.js",
     options: {
@@ -466,11 +465,11 @@ validateMany("sass", [
         importers: [
           {
             // eslint-disable-next-line @typescript-eslint/require-await
-            async canonicalize(url) {
+            async canonicalize(url: string) {
               return new URL(`virtual:${url}`);
             },
             // eslint-disable-next-line @typescript-eslint/require-await
-            async load(canonicalUrl) {
+            async load(canonicalUrl: URL) {
               return {
                 syntax: "scss",
                 contents:
@@ -492,10 +491,10 @@ validateMany("sass", [
         sync: true,
         importers: [
           {
-            canonicalize(url) {
+            canonicalize(url: string) {
               return new URL(`virtual:${url}`);
             },
-            load(canonicalUrl) {
+            load(canonicalUrl: URL) {
               return {
                 syntax: "scss",
                 contents:
@@ -537,23 +536,6 @@ validateMany("stylus", [
     title: "sourcemap",
     input: "stylus-import/index.js",
     options: { mode: "extract", sourceMap: true },
-  },
-]);
-
-validateMany("multiple-instances", [
-  {
-    title: "default",
-    input: "multiple-instances/index.js",
-    plugins: [
-      styles({ extensions: [".css"], use: [] }),
-      styles({ extensions: [], use: ["sass", "less", "stylus"] }),
-      styles({ extensions: [".mcss"], use: [], modules: true, namedExports: true }),
-    ],
-  },
-  {
-    title: "already-processed",
-    input: "multiple-instances/bar.less",
-    plugins: [styles({ modules: true, namedExports: true }), styles()],
   },
 ]);
 

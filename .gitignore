@@ -5,3 +5,5 @@
 /*.log
 /.eslintcache
 /docs
+/__tests__/fixtures/dist
+

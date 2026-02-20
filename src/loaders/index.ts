@@ -1,10 +1,10 @@
 import type PQueue from "p-queue";
-import { Loader, LoaderContext, Payload } from "./types";
-import postcssLoader from "./postcss";
-import sourcemapLoader from "./sourcemap";
-import sassLoader from "./sass";
-import stylusLoader from "./stylus";
-import lessLoader from "./less";
+import lessLoader from "./less/index.js";
+import postcssLoader from "./postcss/index.js";
+import sassLoader from "./sass/index.js";
+import sourcemapLoader from "./sourcemap.js";
+import stylusLoader from "./stylus.js";
+import type { Loader, LoaderContext, Payload } from "./types.js";
 
 function matchFile(file: string, condition: Loader["test"]): boolean {
   if (!condition) return false;
@@ -16,7 +16,7 @@ function matchFile(file: string, condition: Loader["test"]): boolean {
 // which is necessary for some cases
 // ex.: https://github.com/sass/node-sass/issues/857
 const threadPoolSize = process.env.UV_THREADPOOL_SIZE
-  ? Number.parseInt(process.env.UV_THREADPOOL_SIZE)
+  ? Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10)
   : 4; // default `libuv` threadpool size
 
 /** Options for {@link Loaders} class */

@@ -1,7 +1,7 @@
-import { PluginCreator, Result } from "postcss";
 import { extractICSS, replaceSymbols, replaceValueSymbols } from "icss-utils";
-import loadDefault, { Load } from "./load";
-import resolve from "./resolve";
+import type { PluginCreator, Result } from "postcss";
+import loadDefault, { type Load } from "./load.js";
+import resolve from "./resolve.js";
 
 const name = "styles-icss";
 const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];

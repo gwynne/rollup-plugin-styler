@@ -1,5 +1,5 @@
-import { Declaration } from "postcss";
-import valueParser, { Node, ParsedValue } from "postcss-value-parser";
+import type { Declaration } from "postcss";
+import valueParser, { type Node, type ParsedValue } from "postcss-value-parser";
 
 const urlFuncRe = /^url$/i;
 const imageSetFuncRe = /^(?:-webkit-)?image-set$/i;
@@ -34,7 +34,6 @@ export const walkUrls = (
           const [urlNode] = nodes;
           const url = urlNode?.type === "string" ? urlNode.value : valueParser.stringify(nodes);
           callback(url.replaceAll(/^\s+|\s+$/g, ""), urlNode);
-          continue;
         }
       }
     }

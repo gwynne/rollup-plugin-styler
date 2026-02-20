@@ -1,12 +1,12 @@
-import * as postcss from "postcss";
-import { Options as CssNanoOptions } from "cssnano";
-import { ImportOptions } from "./loaders/postcss/import";
-import { UrlOptions } from "./loaders/postcss/url";
-import { ModulesOptions } from "./loaders/postcss/modules";
-import { SASSLoaderOptions } from "./loaders/sass";
-import { LESSLoaderOptions } from "./loaders/less";
-import { StylusLoaderOptions } from "./loaders/stylus";
-import { SourceMapOptions, Loader } from "./loaders/types";
+import type { Options as CssNanoOptions } from "cssnano";
+import type * as postcss from "postcss";
+import type { LESSLoaderOptions } from "./loaders/less/index.js";
+import type { ImportOptions } from "./loaders/postcss/import/index.js";
+import type { ModulesOptions } from "./loaders/postcss/modules/index.js";
+import type { UrlOptions } from "./loaders/postcss/url/index.js";
+import type { SASSLoaderOptions } from "./loaders/sass/index.js";
+import type { StylusLoaderOptions } from "./loaders/stylus.js";
+import type { Loader, SourceMapOptions } from "./loaders/types.js";
 
 /** Options for PostCSS config loader */
 export interface PostCSSConfigLoaderOptions {

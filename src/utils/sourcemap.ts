@@ -1,8 +1,8 @@
-import path from "path";
+import path from "node:path";
 import fs from "fs-extra";
-import { RawSourceMap, SourceMapConsumer } from "source-map-js";
-import { dataURIRe } from "../loaders/postcss/common";
-import { isAbsolutePath, relativePath, resolvePath, normalizePath } from "./path";
+import { type RawSourceMap, SourceMapConsumer } from "source-map-js";
+import { dataURIRe } from "../loaders/postcss/common.js";
+import { isAbsolutePath, normalizePath, relativePath, resolvePath } from "./path.js";
 
 const mapBlockRe = /(?:\n|\r\n)?\/\*[#*@]+?\s*?sourceMappingURL\s*?=\s*?(\S+)\s*?\*+?\//gm;
 const mapLineRe = /(?:\n|\r\n)?\/\/[#@]+?\s*?sourceMappingURL\s*?=\s*?(\S+)\s*?$/gm;

@@ -1,16 +1,15 @@
-import { readdirSync } from "fs";
-
-import terser from "@rollup/plugin-terser";
+import { readdirSync } from "node:fs";
+import { URL } from "node:url";
 import { babel } from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
+import json from "@rollup/plugin-json";
+import resolve from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
+import terser from "@rollup/plugin-terser";
+import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 // eslint-disable-next-line import/no-unresolved
 import externals from "rollup-plugin-node-externals";
-import json from "@rollup/plugin-json";
-import replace from "@rollup/plugin-replace";
-import resolve from "@rollup/plugin-node-resolve";
-import typescript from "@rollup/plugin-typescript";
-import { URL } from "url";
 import pkg from "./package.json" with { type: "json" };
 
 const extensions = [".ts", ".mjs", ".js", ".cjs", ".json"];

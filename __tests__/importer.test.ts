@@ -1,6 +1,7 @@
 import postcss from "postcss";
-import importer, { ImportOptions } from "../src/loaders/postcss/import";
-import { fixture } from "./helpers";
+import type { ImportFile } from "src/loaders/postcss/import/resolve.js";
+import importer, { type ImportOptions } from "../src/loaders/postcss/import/index.js";
+import { fixture } from "./helpers/index.js";
 
 const validateImport = async (
   css: string,
@@ -46,7 +47,7 @@ describe("importer", () => {
   it("warns about incorrect resolving", async () => {
     const warning = await validateImport('@import "smh.css"', {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return
-      resolve: () => "lol" as any,
+      resolve: () => "lol" as unknown as Promise<ImportFile>,
     });
     expect(warning).toMatchSnapshot("warning");
   });

@@ -1,6 +1,6 @@
 import fs from "fs-extra";
-import { resolveAsync } from "../../utils/resolve";
-import { getUrlOfPartial, normalizeUrl } from "../../utils/url";
+import { resolveAsync } from "../../utils/resolve.js";
+import { getUrlOfPartial, normalizeUrl } from "../../utils/url.js";
 
 const extensions = [".less", ".css"];
 

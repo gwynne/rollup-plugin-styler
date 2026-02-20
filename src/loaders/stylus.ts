@@ -1,9 +1,9 @@
-import path from "path";
+import path from "node:path";
 import fs from "fs-extra";
-import { mm } from "../utils/sourcemap";
-import { normalizePath } from "../utils/path";
-import { Loader } from "./types";
-import { RawSourceMap } from "source-map-js";
+import type { RawSourceMap } from "source-map-js";
+import { normalizePath } from "../utils/path.js";
+import { mm } from "../utils/sourcemap.js";
+import type { Loader } from "./types.js";
 
 /** Options for Stylus loader */
 export interface StylusLoaderOptions extends Record<string, unknown>, stylus.PublicOptions {}

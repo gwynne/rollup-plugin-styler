@@ -1,8 +1,8 @@
-import path from "path";
+import path from "node:path";
 import fs from "fs-extra";
-import { ProcessOptions } from "postcss";
-import Processor from "postcss/lib/processor";
-import { resolveAsync } from "../../../utils/resolve";
+import type { ProcessOptions } from "postcss";
+import type Processor from "postcss/lib/processor";
+import { resolveAsync } from "../../../utils/resolve.js";
 
 export type Load = (
   url: string,

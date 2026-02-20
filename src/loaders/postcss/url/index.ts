@@ -1,13 +1,13 @@
-import path from "path";
-import { Declaration, PluginCreator } from "postcss";
-import valueParser, { Node, ParsedValue } from "postcss-value-parser";
-import { mm } from "../../../utils/sourcemap";
-import { normalizePath, isAbsolutePath } from "../../../utils/path";
-import { firstExtRe, dataURIRe } from "../common";
-import resolveDefault, { UrlResolve, UrlFile } from "./resolve";
-import generateName from "./generate";
-import { walkUrls, isDeclWithUrl } from "./utils";
-import inlineFile from "./inline";
+import path from "node:path";
+import type { Declaration, PluginCreator } from "postcss";
+import valueParser, { type Node, type ParsedValue } from "postcss-value-parser";
+import { isAbsolutePath, normalizePath } from "../../../utils/path.js";
+import { mm } from "../../../utils/sourcemap.js";
+import { dataURIRe, firstExtRe } from "../common.js";
+import generateName from "./generate.js";
+import inlineFile from "./inline.js";
+import resolveDefault, { type UrlFile, type UrlResolve } from "./resolve.js";
+import { isDeclWithUrl, walkUrls } from "./utils.js";
 
 const name = "styles-url";
 const placeholderHashDefault = "assets/[name]-[hash][extname]";

@@ -1,10 +1,10 @@
-import { Plugin } from "postcss";
-import Processor from "postcss/lib/processor";
-import modulesValues from "postcss-modules-values";
-import localByDefault from "postcss-modules-local-by-default";
+import type { Plugin } from "postcss";
+import type Processor from "postcss/lib/processor";
 import extractImports from "postcss-modules-extract-imports";
+import localByDefault from "postcss-modules-local-by-default";
 import modulesScope from "postcss-modules-scope";
-import generateScopedNameDefault from "./generate";
+import modulesValues from "postcss-modules-values";
+import generateScopedNameDefault from "./generate.js";
 
 /** Options for [CSS Modules](https://github.com/css-modules/css-modules) */
 export interface ModulesOptions {

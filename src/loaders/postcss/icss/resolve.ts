@@ -1,7 +1,7 @@
-import { ProcessOptions } from "postcss";
-import Processor from "postcss/lib/processor";
-import { CSSImports } from "icss-utils";
-import { Load } from "./load";
+import type { CSSImports } from "icss-utils";
+import type { ProcessOptions } from "postcss";
+import type Processor from "postcss/lib/processor";
+import type { Load } from "./load.js";
 
 export default async function (
   icssImports: CSSImports,

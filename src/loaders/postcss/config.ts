@@ -1,8 +1,8 @@
-import path from "path";
-import { Parser, Syntax, Stringifier, AcceptedPlugin, PluginCreator } from "postcss";
+import path from "node:path";
 import { cosmiconfig } from "cosmiconfig";
-import { PostCSSConfigLoaderOptions } from "../../types";
-import { ensurePCSSPlugins, ensurePCSSOption } from "../../utils/options";
+import type { AcceptedPlugin, Parser, PluginCreator, Stringifier, Syntax } from "postcss";
+import type { PostCSSConfigLoaderOptions } from "../../types.js";
+import { ensurePCSSOption, ensurePCSSPlugins } from "../../utils/options.js";
 
 interface Options {
   parser?: Parser;
@@ -37,7 +37,7 @@ export default async function (
     typeof found.config === "function"
       ? found.config({
           cwd: process.cwd(),
-          env: process.env["NODE_ENV"] ?? "development",
+          env: process.env.NODE_ENV ?? "development",
           file: { extname: ext, dirname: dir, basename: base },
           options: config.ctx ?? {},
         })

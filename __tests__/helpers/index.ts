@@ -1,12 +1,11 @@
 /* eslint-disable jest/no-export */
-import path from "path";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import fs from "fs-extra";
-import { Plugin, rollup, InputOptions, OutputOptions } from "rollup";
-
-import styles from "../../src";
-import { Options } from "../../src/types";
-import { inferModeOption, inferSourceMapOption } from "../../src/utils/options";
-import { fileURLToPath } from "url";
+import { type InputOptions, type OutputOptions, type Plugin, rollup } from "rollup";
+import styles from "../../src/index.js";
+import type { Options } from "../../src/types.js";
+import { inferModeOption, inferSourceMapOption } from "../../src/utils/options.js";
 
 const baseDir = path.dirname(fileURLToPath(import.meta.url));
 

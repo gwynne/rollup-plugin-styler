@@ -1,5 +1,7 @@
 import postcss from "postcss";
-import urlResolver, { UrlOptions } from "../src/loaders/postcss/url";
+import type { UrlFile } from "src/loaders/postcss/url/resolve.js";
+import urlResolver, { type UrlOptions } from "../src/loaders/postcss/url/index.js";
+
 // import { fixture } from "./helpers";
 
 const validateUrl = async (
@@ -26,7 +28,7 @@ describe("url resolver", () => {
   it("warns about incorrect resolving", async () => {
     const warning = await validateUrl(".foo{background:url(bg.png)}", {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return
-      resolve: () => "lol" as any,
+      resolve: async () => "lol" as unknown as UrlFile,
     });
     expect(warning).toMatchSnapshot("warning");
   });

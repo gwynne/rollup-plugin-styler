@@ -1,8 +1,8 @@
-import resolver, { AsyncOpts, SyncOpts, PackageJSON } from "resolve";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import resolver, { type AsyncOpts, type PackageJSON, type SyncOpts } from "resolve";
 import { resolve as resolveExports, legacy as resolveFields } from "resolve.exports";
-import arrayFmt from "./array-fmt";
-import path from "path";
-import { fileURLToPath } from "url";
+import arrayFmt from "./array-fmt.js";
 
 const baseDir = path.dirname(fileURLToPath(import.meta.url));
 

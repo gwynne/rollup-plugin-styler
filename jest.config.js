@@ -15,4 +15,7 @@ export default {
     "!**/*.d.ts",
     "!**/.eslintrc.cjs",
   ],
+  moduleNameMapper: {
+    "^(.{1,2}/.*)\\.js$": "$1",
+  },
 };

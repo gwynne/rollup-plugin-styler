@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 
 export const isAbsolutePath = (path: string): boolean => /^(?:\/|(?:[A-Za-z]:)?[/\\|])/.test(path);
 

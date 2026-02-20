@@ -1,2 +1,2 @@
-@import "virtualimport";
-@import "~modularvirtualimport";
+@use "virtualimport";
+@use "~modularvirtualimport" as virtual;

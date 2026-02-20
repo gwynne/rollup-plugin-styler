@@ -1,4 +1,5 @@
-import { PluginCreator } from "postcss";
+import type { PluginCreator } from "postcss";
+
 const name = "styles-noop";
 const plugin: PluginCreator<unknown> = () => ({ postcssPlugin: name });
 plugin.postcss = true;

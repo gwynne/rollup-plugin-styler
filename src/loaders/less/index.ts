@@ -1,7 +1,7 @@
-import path from "path";
-import { normalizePath } from "../../utils/path";
-import { Loader } from "../types";
-import importer from "./importer";
+import path from "node:path";
+import { normalizePath } from "../../utils/path.js";
+import type { Loader } from "../types.js";
+import importer from "./importer.js";
 
 /** Options for Less loader */
 export interface LESSLoaderOptions extends Record<string, unknown>, Less.Options {}

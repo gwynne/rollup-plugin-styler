@@ -1,8 +1,8 @@
-import path from "path";
-import postcss, { PluginCreator, Result, AtRule } from "postcss";
+import path from "node:path";
+import postcss, { type AtRule, type PluginCreator, type Result } from "postcss";
 import valueParser from "postcss-value-parser";
-import { isAbsolutePath, normalizePath } from "../../../utils/path";
-import resolveDefault, { ImportResolve } from "./resolve";
+import { isAbsolutePath, normalizePath } from "../../../utils/path.js";
+import resolveDefault, { type ImportResolve } from "./resolve.js";
 
 const name = "styles-import";
 const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];

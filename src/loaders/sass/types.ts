@@ -1,12 +1,12 @@
 import type {
-  Importer as SassImporter,
+  CompileResult,
   FileImporter as SassFileImporter,
-} from "sass/types/importer";
-import type { StringOptions as SassOptions } from "sass/types/options";
-import type { CompileResult } from "sass/types/compile";
+  Importer as SassImporter,
+  StringOptions as SassOptions,
+} from "sass-embedded";
 
-export type { CanonicalizeContext, NodePackageImporter } from "sass/types/importer";
-export type SassModule = typeof import("sass");
+export type { CanonicalizeContext, NodePackageImporter } from "sass-embedded";
+export type SassModule = typeof import("sass-embedded");
 export type SyncImporter = SassImporter<"sync">;
 export type SyncFileImporter = SassFileImporter<"sync">;
 export type AsyncImporter = SassImporter<"async">;

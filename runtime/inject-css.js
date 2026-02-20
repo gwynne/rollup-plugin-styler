@@ -27,8 +27,8 @@ export default function (css, options) {
     var styleTag = document.createElement("style");
     styleTag.setAttribute("type", "text/css");
     if (options.attributes) {
-      var k = Object.keys(options.attributes);
-      for (var i = 0; i < k.length; i++) {
+      const k = Object.keys(options.attributes);
+      for (let i = 0; i < k.length; i++) {
         styleTag.setAttribute(k[i], options.attributes[k[i]]);
       }
     }
@@ -41,14 +41,14 @@ export default function (css, options) {
   var styleTag;
 
   if (singleTag) {
-    var id = containers.indexOf(container);
+    let id = containers.indexOf(container);
 
     if (id === -1) {
       id = containers.push(container) - 1;
       styleTags[id] = {};
     }
 
-    if (styleTags[id] && styleTags[id][position]) {
+    if (styleTags[id]?.[position]) {
       styleTag = styleTags[id][position];
     } else {
       styleTag = styleTags[id][position] = createStyleTag();

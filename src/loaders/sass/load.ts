@@ -1,5 +1,5 @@
-import arrayFmt from "../../utils/array-fmt";
-import type { SassModule } from "./types";
+import arrayFmt from "../../utils/array-fmt.js";
+import type { SassModule } from "./types.js";
 
 const ids = ["sass-embedded", "sass"];
 const idsFmt = arrayFmt(ids);
@@ -21,6 +21,7 @@ export default async function (impl?: string): Promise<readonly [SassModule, str
     try {
       // eslint-disable-next-line no-await-in-loop
       const sass: SassModule = (await import(id)) as SassModule;
+
       if (sass) return [sass, id] as const;
       // eslint-disable-next-line no-empty
     } catch {}

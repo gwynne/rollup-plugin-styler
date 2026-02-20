@@ -1,8 +1,8 @@
 import path from "node:path";
-import { packageFilterBuilder, resolveAsync, resolveSync } from "../../utils/resolve";
-import { getUrlOfPartial, isModule, normalizeUrl } from "../../utils/url";
-import { CanonicalizeContext, AsyncFileImporter, SyncFileImporter } from "./types";
-import { pathToFileURL } from "url";
+import { pathToFileURL } from "node:url";
+import { packageFilterBuilder, resolveAsync, resolveSync } from "../../utils/resolve.js";
+import { getUrlOfPartial, isModule, normalizeUrl } from "../../utils/url.js";
+import type { AsyncFileImporter, CanonicalizeContext, SyncFileImporter } from "./types.js";
 
 const extensions = [".scss", ".sass", ".css"];
 const conditions = ["sass", "style"];

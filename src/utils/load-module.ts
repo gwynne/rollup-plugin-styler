@@ -1,5 +1,6 @@
-import { resolveSync, ResolveOpts } from "./resolve";
 import { createRequire } from "node:module";
+import { type ResolveOpts, resolveSync } from "./resolve.js";
+
 const require = createRequire(import.meta.url);
 
 const loaded: Record<string, unknown> = {};

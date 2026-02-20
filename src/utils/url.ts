@@ -1,5 +1,5 @@
-import path from "path";
-import { isAbsolutePath, isRelativePath, normalizePath } from "./path";
+import path from "node:path";
+import { isAbsolutePath, isRelativePath, normalizePath } from "./path.js";
 
 export const isModule = (url: string): boolean => /^~[\d@A-Za-z]/.test(url);
 

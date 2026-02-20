@@ -1,8 +1,8 @@
-import { AcceptedPlugin } from "postcss";
-import { LoaderContext } from "../loaders/types";
-import { Options, PostCSSLoaderOptions } from "../types";
-import loadModule from "./load-module";
-import arrayFmt from "./array-fmt";
+import type { AcceptedPlugin } from "postcss";
+import type { LoaderContext } from "../loaders/types.js";
+import type { Options, PostCSSLoaderOptions } from "../types.js";
+import arrayFmt from "./array-fmt.js";
+import loadModule from "./load-module.js";
 
 export function inferOption<T, TDef extends T | boolean>(
   option: T | boolean | undefined,

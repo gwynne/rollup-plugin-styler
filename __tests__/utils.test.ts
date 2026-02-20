@@ -1,15 +1,14 @@
 import { jest } from "@jest/globals";
 import postcss from "postcss";
-import Loaders from "../src/loaders";
-import postcssNoop from "../src/loaders/postcss/noop";
-import loadSass from "../src/loaders/sass/load";
-import { ensurePCSSOption } from "../src/utils/options";
-import { mm, getMap, stripMap } from "../src/utils/sourcemap";
-import { humanlizePath } from "../src/utils/path";
-
-import { fixture } from "./helpers";
-
-import loadModule from "../src/utils/load-module";
+import type { LoaderContext } from "src/loaders/types.js";
+import Loaders from "../src/loaders/index.js";
+import postcssNoop from "../src/loaders/postcss/noop.js";
+import loadSass from "../src/loaders/sass/load.js";
+import loadModule from "../src/utils/load-module.js";
+import { ensurePCSSOption } from "../src/utils/options.js";
+import { humanlizePath } from "../src/utils/path.js";
+import { getMap, mm, stripMap } from "../src/utils/sourcemap.js";
+import { fixture } from "./helpers/index.js";
 
 const genericFailure = () => {
   throw new Error("fail");
@@ -40,7 +39,7 @@ describe("less", () => {
     const loaders = new Loaders({ use: [["less", {}]], loaders: [], extensions: [""] });
     await expect(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-explicit-any
-      loaders.process({ code: "" }, { id: "file.less" } as any),
+      loaders.process({ code: "" }, { id: "file.less" } as LoaderContext),
     ).rejects.toThrowErrorMatchingSnapshot();
   });
 });
@@ -51,7 +50,7 @@ describe("stylus", () => {
     const loaders = new Loaders({ use: [["stylus", {}]], loaders: [], extensions: [""] });
     await expect(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-explicit-any
-      loaders.process({ code: "" }, { id: "file.styl" } as any),
+      loaders.process({ code: "" }, { id: "file.styl" } as LoaderContext),
     ).rejects.toThrowErrorMatchingSnapshot();
   });
 });
@@ -62,6 +61,7 @@ describe("load-sass", () => {
   });
 
   test("not found", async () => {
+    jest.unstable_mockModule("sass-embedded", genericFailure);
     jest.unstable_mockModule("sass", genericFailure);
     return expect(async () => loadSass()).rejects.toThrowErrorMatchingSnapshot();
   });

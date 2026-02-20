@@ -1,16 +1,16 @@
-import { normalizePath } from "../../utils/path";
-import { Loader } from "../types";
-import loadSass from "./load";
-import { importer, importerSync } from "./importer";
-import {
-  Importer,
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { normalizePath } from "../../utils/path.js";
+import type { Loader } from "../types.js";
+import { importer, importerSync } from "./importer.js";
+import loadSass from "./load.js";
+import type {
   FileImporter,
+  Importer,
   NodePackageImporter,
   Options,
   PublicOptions,
   Result,
-} from "./types";
-import { pathToFileURL, fileURLToPath } from "url";
+} from "./types.js";
 
 /** Options for Sass loader */
 export interface SASSLoaderOptions extends Record<string, unknown>, PublicOptions {
@@ -25,13 +25,14 @@ const loader: Loader<SASSLoaderOptions> = {
   test: /\.(sass|scss)$/i,
   async process({ code, map }) {
     const options = { ...this.options };
-    const [sass, type] = await loadSass(options.impl);
-    const sync = options.sync ?? type !== "node-sass";
-    const importers: (NodePackageImporter | Importer | FileImporter)[] = [
-      sync ? importerSync : importer,
-    ];
+    const [sass] = await loadSass(options.impl);
+    const sync = options.sync ?? false;
+    const importers: (NodePackageImporter | Importer | FileImporter)[] = [];
 
-    if (options.importers) importers.push(...options.importers);
+    if (options.importers) {
+      importers.push(...options.importers);
+    }
+    importers.push(sync ? importerSync : importer);
 
     const render = async (options: Options): Promise<Result> => {
       return sync
@@ -52,7 +53,9 @@ const loader: Loader<SASSLoaderOptions> = {
       importers: importers,
     });
 
-    const deps = res.loadedUrls.map(u => fileURLToPath(u));
+    const deps = res.loadedUrls
+      .filter((u: URL) => u.protocol === "file")
+      .map(u => fileURLToPath(u));
     for (const dep of deps) this.deps.add(normalizePath(dep));
 
     if (res.sourceMap) {

@@ -184,7 +184,7 @@ exports[`basic resolvers: css 1`] = `
 }
 
 .foo3 {
-  background-image: url("./bg.png?query#hash");
+  background-image: url("/pubpath/bg.png?query#hash");
 }
 @import url("https://fonts.googleapis.com/css?family=Gudea:400,700");
 .bar {
@@ -235,7 +235,7 @@ exports[`basic resolvers-hash: css 1`] = `
 }
 
 .foo3 {
-  background-image: url("./bg.png?query#hash");
+  background-image: url("/pubpath/bg-bd25d3fd.png?query#hash");
 }
 @import url("https://fonts.googleapis.com/css?family=Gudea:400,700");
 .bar {
@@ -286,7 +286,7 @@ exports[`basic resolvers-url-inline: css 1`] = `
 }
 
 .foo3 {
-  background-image: url("./bg.png?query#hash");
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAABmBAMAAADL8flRAAAAG1BMVEXMzMyWlpacnJy+vr6jo6PFxcW3t7eqqqqxsbHbm8QuAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAArUlEQVRYhe3QIQ+CUBTF8cPTB8RHsKMTqQQ/gMqmVRkj4+ZmZQRnNBD42F7Afp3N7fxIN/zH2wGIiIiI6J8ZBKk95NMRo23KdaYksz36oKtv47F14et59HdKY69I7AoX9PMMlTPnIrZOe5sHJ18Hc5fDeXKH2n+mpmzgLz6NPWmJNIlNNkA4NvK2ov6ikQ1kqWKYYdggVxNpgtREER6ygTyzbZaRugERERER/eYNUMwTiwsgIHkAAAAASUVORK5CYII=");
 }
 @import url("https://fonts.googleapis.com/css?family=Gudea:400,700");
 .bar {
@@ -495,10 +495,11 @@ exports[`code-splitting manual-chunks: css 1`] = `
 ".first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
-/*# sourceMappingURL=first-C0UnfSPr.css.map */"
+/*# sourceMappingURL=first-CinPz4ld.css.map */"
 `;
 
 exports[`code-splitting manual-chunks: css 2`] = `
@@ -564,7 +565,7 @@ exports[`code-splitting manual-chunks: css 8`] = `
 `;
 
 exports[`code-splitting manual-chunks: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -586,7 +587,7 @@ import './nested-script-MoN0W8vn.js';
 import './nondynamics-CYQNmqgG.js';
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-I6BGCDCS.js');
   console.log(first, second, otherScript);
@@ -602,7 +603,7 @@ import './nested-script-MoN0W8vn.js';
 import './nondynamics-CYQNmqgG.js';
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-I6BGCDCS.js');
   console.log(first, second, otherScript);
@@ -653,7 +654,7 @@ exports[`code-splitting manual-chunks: js 10`] = `
 "
 `;
 
-exports[`code-splitting manual-chunks: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF","file":"first-C0UnfSPr.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
+exports[`code-splitting manual-chunks: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF","file":"first-CinPz4ld.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
 
 exports[`code-splitting manual-chunks: map 2`] = `"{"version":3,"sources":["../../../../code-splitting/fourth.scss","../../../../code-splitting/fourthtwo.scss"],"names":[],"mappings":"AAAA;EACE,cAAA;AACF;ACFA;EACE,eAAA;AACF","file":"fourts-w658Eix5.css","sourcesContent":[".fourth {\\n  color: magenta;\\n}\\n",".fourthtwo {\\n  color: honeydew;\\n}\\n"]}"`;
 
@@ -686,6 +687,7 @@ exports[`code-splitting manual-chunks-only: css 2`] = `
 .first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
@@ -698,7 +700,7 @@ exports[`code-splitting manual-chunks-only: css 2`] = `
 .nestedScript_nestedScript {
   color: rebeccapurple;
 }
-/*# sourceMappingURL=index-B46kMlwO.css.map */"
+/*# sourceMappingURL=index-DjtLRd7A.css.map */"
 `;
 
 exports[`code-splitting manual-chunks-only: css 3`] = `
@@ -754,7 +756,7 @@ console.log(modules_d55e0e9b);
 
 console.log(modules_3ede29d3);
 
-var css$1 = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+var css$1 = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 var first = /*#__PURE__*/Object.freeze({
@@ -815,14 +817,20 @@ exports[`code-splitting manual-chunks-only: js 5`] = `
 
 exports[`code-splitting manual-chunks-only: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/fourth.scss","../../../../code-splitting/fourthtwo.scss"],"names":[],"mappings":"AAAA;EACE,cAAA;AACF;ACFA;EACE,eAAA;AACF","file":"fourts-w658Eix5.css","sourcesContent":[".fourth {\\n  color: magenta;\\n}\\n",".fourthtwo {\\n  color: honeydew;\\n}\\n"]}"`;
 
-exports[`code-splitting manual-chunks-only: map 2`] = `"{"version":3,"sources":["../../../../code-splitting/sub/first.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/nested-script.scss"],"names":[],"mappings":"AAAA;EACE,YAAA;AACF;ACFA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF;ACHA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF","file":"index-B46kMlwO.css","sourcesContent":[".first_sub {\\n  color: black;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n"]}"`;
+exports[`code-splitting manual-chunks-only: map 2`] = `"{"version":3,"sources":["../../../../code-splitting/sub/first.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/nested-script.scss"],"names":[],"mappings":"AAAA;EACE,YAAA;AACF;ACFA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF;ACNA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF","file":"index-DjtLRd7A.css","sourcesContent":[".first_sub {\\n  color: black;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n"]}"`;
 
 exports[`code-splitting manual-chunks-only: map 3`] = `"{"version":3,"sources":["../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF","file":"nondynamics-Bv0e41YY.css","sourcesContent":[".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n"]}"`;
 
 exports[`code-splitting manual-chunks-only: map 4`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/thirdtwo.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF","file":"thirds-B9yDFd1n.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".thirdtwo {\\n  color: hotpink;\\n}\\n"]}"`;
 
 exports[`code-splitting manual-chunks-only-single: css 1`] = `
-".fourth_fourth {
+".third_third {
+  color: maroon;
+}
+.thirdtwo_thirdtwo {
+  color: hotpink;
+}
+.fourth_fourth {
   color: magenta;
 }
 .fourthtwo_fourthtwo {
@@ -834,18 +842,13 @@ exports[`code-splitting manual-chunks-only-single: css 1`] = `
 .nondynamic2_nondynamic2 {
   color: deeppink;
 }
-.third_third {
-  color: maroon;
-}
-.thirdtwo_thirdtwo {
-  color: hotpink;
-}
 .first_first_sub {
   color: black;
 }
 .first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
@@ -858,7 +861,7 @@ exports[`code-splitting manual-chunks-only-single: css 1`] = `
 .nestedScript_nestedScript {
   color: rebeccapurple;
 }
-/*# sourceMappingURL=extracted-Dxd_rod5.css.map */"
+/*# sourceMappingURL=extracted-DUG2LJJs.css.map */"
 `;
 
 exports[`code-splitting manual-chunks-only-single: js 1`] = `
@@ -894,7 +897,7 @@ console.log(modules_d55e0e9b);
 
 console.log(modules_3ede29d3);
 
-var css$1 = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+var css$1 = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 var first = /*#__PURE__*/Object.freeze({
@@ -953,10 +956,16 @@ exports[`code-splitting manual-chunks-only-single: js 5`] = `
 "
 `;
 
-exports[`code-splitting manual-chunks-only-single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/fourth.scss","../../../../code-splitting/fourthtwo.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss","../../../../code-splitting/third.scss","../../../../code-splitting/thirdtwo.scss","../../../../code-splitting/sub/first.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/nested-script.scss"],"names":[],"mappings":"AAAA;EACE,cAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF;ACHA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF","file":"extracted-Dxd_rod5.css","sourcesContent":[".fourth {\\n  color: magenta;\\n}\\n",".fourthtwo {\\n  color: honeydew;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n",".third {\\n  color: maroon;\\n}\\n",".thirdtwo {\\n  color: hotpink;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n"]}"`;
+exports[`code-splitting manual-chunks-only-single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/thirdtwo.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/fourthtwo.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss","../../../../code-splitting/sub/first.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/nested-script.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF;ACNA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF","file":"extracted-DUG2LJJs.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".thirdtwo {\\n  color: hotpink;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".fourthtwo {\\n  color: honeydew;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n"]}"`;
 
 exports[`code-splitting manual-chunks-single: css 1`] = `
-".fourth_fourth {
+".third_third {
+  color: maroon;
+}
+.thirdtwo_thirdtwo {
+  color: hotpink;
+}
+.fourth_fourth {
   color: magenta;
 }
 .fourthtwo_fourthtwo {
@@ -968,15 +977,10 @@ exports[`code-splitting manual-chunks-single: css 1`] = `
 .nondynamic2_nondynamic2 {
   color: deeppink;
 }
-.third_third {
-  color: maroon;
-}
-.thirdtwo_thirdtwo {
-  color: hotpink;
-}
 .first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
@@ -992,11 +996,11 @@ exports[`code-splitting manual-chunks-single: css 1`] = `
 .nestedScript_nestedScript {
   color: rebeccapurple;
 }
-/*# sourceMappingURL=extracted-6hQGiwqG.css.map */"
+/*# sourceMappingURL=extracted-CRYvO2CP.css.map */"
 `;
 
 exports[`code-splitting manual-chunks-single: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -1018,7 +1022,7 @@ import './nested-script-MoN0W8vn.js';
 import './nondynamics-CYQNmqgG.js';
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-I6BGCDCS.js');
   console.log(first, second, otherScript);
@@ -1034,7 +1038,7 @@ import './nested-script-MoN0W8vn.js';
 import './nondynamics-CYQNmqgG.js';
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-I6BGCDCS.js');
   console.log(first, second, otherScript);
@@ -1085,16 +1089,17 @@ exports[`code-splitting manual-chunks-single: js 10`] = `
 "
 `;
 
-exports[`code-splitting manual-chunks-single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/fourth.scss","../../../../code-splitting/fourthtwo.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss","../../../../code-splitting/third.scss","../../../../code-splitting/thirdtwo.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/sub/first.scss","../../../../code-splitting/nested-script.scss"],"names":[],"mappings":"AAAA;EACE,cAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF;ACHA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF","file":"extracted-6hQGiwqG.css","sourcesContent":[".fourth {\\n  color: magenta;\\n}\\n",".fourthtwo {\\n  color: honeydew;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n",".third {\\n  color: maroon;\\n}\\n",".thirdtwo {\\n  color: hotpink;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n"]}"`;
+exports[`code-splitting manual-chunks-single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/thirdtwo.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/fourthtwo.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/sub/first.scss","../../../../code-splitting/nested-script.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF;ACNA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF","file":"extracted-CRYvO2CP.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".thirdtwo {\\n  color: hotpink;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".fourthtwo {\\n  color: honeydew;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n"]}"`;
 
 exports[`code-splitting multi-entry: css 1`] = `
 ".first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
-/*# sourceMappingURL=first-C0UnfSPr.css.map */"
+/*# sourceMappingURL=first-CinPz4ld.css.map */"
 `;
 
 exports[`code-splitting multi-entry: css 2`] = `
@@ -1152,7 +1157,7 @@ exports[`code-splitting multi-entry: css 7`] = `
 `;
 
 exports[`code-splitting multi-entry: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -1170,7 +1175,7 @@ exports[`code-splitting multi-entry: js 3`] = `
 var modules_d55e0e9b = {"fourth":"fourth_fourth"};
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-CdSNSsfp.js');
   console.log(first, second, otherScript);
@@ -1186,7 +1191,7 @@ exports[`code-splitting multi-entry: js 4`] = `
 var modules_3ede29d3 = {"fourthtwo":"fourthtwo_fourthtwo"};
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-CdSNSsfp.js');
   console.log(first, second, otherScript);
@@ -1225,7 +1230,7 @@ export { css, modules_7a038d99 as default };
 "
 `;
 
-exports[`code-splitting multi-entry: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF","file":"first-C0UnfSPr.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
+exports[`code-splitting multi-entry: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF","file":"first-CinPz4ld.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
 
 exports[`code-splitting multi-entry: map 2`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/fourth.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF","file":"index-CbRACIBJ.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n"]}"`;
 
@@ -1258,6 +1263,7 @@ exports[`code-splitting multi-entry-single: css 1`] = `
 .first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
@@ -1276,11 +1282,11 @@ exports[`code-splitting multi-entry-single: css 1`] = `
 .nondynamic2_nondynamic2 {
   color: deeppink;
 }
-/*# sourceMappingURL=extracted-BHSf5-0V.css.map */"
+/*# sourceMappingURL=extracted-zdD_XA4U.css.map */"
 `;
 
 exports[`code-splitting multi-entry-single: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -1298,7 +1304,7 @@ exports[`code-splitting multi-entry-single: js 3`] = `
 var modules_d55e0e9b = {"fourth":"fourth_fourth"};
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-CdSNSsfp.js');
   console.log(first, second, otherScript);
@@ -1314,7 +1320,7 @@ exports[`code-splitting multi-entry-single: js 4`] = `
 var modules_3ede29d3 = {"fourthtwo":"fourthtwo_fourthtwo"};
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-CdSNSsfp.js');
   console.log(first, second, otherScript);
@@ -1353,16 +1359,17 @@ export { css, modules_7a038d99 as default };
 "
 `;
 
-exports[`code-splitting multi-entry-single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/sub/first.scss","../../../../code-splitting/third.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/thirdtwo.scss","../../../../code-splitting/fourthtwo.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/nested-script.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,YAAA;AACF;ACFA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF;ACHA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF","file":"extracted-BHSf5-0V.css","sourcesContent":[".first_sub {\\n  color: black;\\n}\\n",".third {\\n  color: maroon;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".thirdtwo {\\n  color: hotpink;\\n}\\n",".fourthtwo {\\n  color: honeydew;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n"]}"`;
+exports[`code-splitting multi-entry-single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/sub/first.scss","../../../../code-splitting/third.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/thirdtwo.scss","../../../../code-splitting/fourthtwo.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/nested-script.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,YAAA;AACF;ACFA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,eAAA;AACF;ACFA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF;ACNA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF","file":"extracted-zdD_XA4U.css","sourcesContent":[".first_sub {\\n  color: black;\\n}\\n",".third {\\n  color: maroon;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".thirdtwo {\\n  color: hotpink;\\n}\\n",".fourthtwo {\\n  color: honeydew;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n"]}"`;
 
 exports[`code-splitting preserve-modules: css 1`] = `
 ".first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
-/*# sourceMappingURL=first.scss-C0UnfSPr.css.map */"
+/*# sourceMappingURL=first.scss-CinPz4ld.css.map */"
 `;
 
 exports[`code-splitting preserve-modules: css 2`] = `
@@ -1437,7 +1444,7 @@ exports[`code-splitting preserve-modules: css 9`] = `
 `;
 
 exports[`code-splitting preserve-modules: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -1512,7 +1519,7 @@ exports[`code-splitting preserve-modules: js 10`] = `
 "
 `;
 
-exports[`code-splitting preserve-modules: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF","file":"first.scss-C0UnfSPr.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
+exports[`code-splitting preserve-modules: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF","file":"first.scss-CinPz4ld.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
 
 exports[`code-splitting preserve-modules: map 2`] = `"{"version":3,"sources":["../../../../code-splitting/fourth.scss"],"names":[],"mappings":"AAAA;EACE,cAAA;AACF","file":"fourth.scss-CDnly6Q_.css","sourcesContent":[".fourth {\\n  color: magenta;\\n}\\n"]}"`;
 
@@ -1534,10 +1541,11 @@ exports[`code-splitting preserve-modules-multi-entry: css 1`] = `
 ".first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
-/*# sourceMappingURL=first.scss-C0UnfSPr.css.map */"
+/*# sourceMappingURL=first.scss-CinPz4ld.css.map */"
 `;
 
 exports[`code-splitting preserve-modules-multi-entry: css 2`] = `
@@ -1632,7 +1640,7 @@ exports[`code-splitting preserve-modules-multi-entry: css 11`] = `
 `;
 
 exports[`code-splitting preserve-modules-multi-entry: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -1729,7 +1737,7 @@ exports[`code-splitting preserve-modules-multi-entry: js 12`] = `
 "
 `;
 
-exports[`code-splitting preserve-modules-multi-entry: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF","file":"first.scss-C0UnfSPr.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
+exports[`code-splitting preserve-modules-multi-entry: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF","file":"first.scss-CinPz4ld.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
 
 exports[`code-splitting preserve-modules-multi-entry: map 2`] = `"{"version":3,"sources":["../../../../code-splitting/fourth.scss"],"names":[],"mappings":"AAAA;EACE,cAAA;AACF","file":"fourth.scss-CDnly6Q_.css","sourcesContent":[".fourth {\\n  color: magenta;\\n}\\n"]}"`;
 
@@ -1758,6 +1766,7 @@ exports[`code-splitting preserve-modules-single: css 1`] = `
 .first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
@@ -1782,11 +1791,11 @@ exports[`code-splitting preserve-modules-single: css 1`] = `
 .nondynamic2_nondynamic2 {
   color: deeppink;
 }
-/*# sourceMappingURL=extracted-qblqWtV1.css.map */"
+/*# sourceMappingURL=extracted-DKvszpz9.css.map */"
 `;
 
 exports[`code-splitting preserve-modules-single: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -1861,7 +1870,7 @@ exports[`code-splitting preserve-modules-single: js 10`] = `
 "
 `;
 
-exports[`code-splitting preserve-modules-single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/sub/first.scss","../../../../code-splitting/nested-script.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF;ACHA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF","file":"extracted-qblqWtV1.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n"]}"`;
+exports[`code-splitting preserve-modules-single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/sub/first.scss","../../../../code-splitting/nested-script.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF;ACNA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF","file":"extracted-DKvszpz9.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n"]}"`;
 
 exports[`code-splitting single: css 1`] = `
 ".third_third {
@@ -1876,6 +1885,7 @@ exports[`code-splitting single: css 1`] = `
 .first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
@@ -1894,11 +1904,11 @@ exports[`code-splitting single: css 1`] = `
 .nondynamic2_nondynamic2 {
   color: deeppink;
 }
-/*# sourceMappingURL=extracted-CFxy8XgM.css.map */"
+/*# sourceMappingURL=extracted-B_rMTnx4.css.map */"
 `;
 
 exports[`code-splitting single: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -1911,7 +1921,7 @@ exports[`code-splitting single: js 2`] = `
 console.log("sub");
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-CdSNSsfp.js');
   console.log(first, second, otherScript);
@@ -1950,16 +1960,17 @@ export { css, modules_7a038d99 as default };
 "
 `;
 
-exports[`code-splitting single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/sub/first.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/nested-script.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF;ACHA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF","file":"extracted-CFxy8XgM.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n"]}"`;
+exports[`code-splitting single: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/sub/first.scss","../../../../code-splitting/partial.css","../../../../code-splitting/first.scss","../../../../code-splitting/second.scss","../../../../code-splitting/other-script.scss","../../../../code-splitting/nested-script.scss","../../../../code-splitting/nondynamic.scss","../../../../code-splitting/nondynamic2.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF;ACNA;EACE,gBAAA;AACF;ACFA;EACE,YAAA;AACF;ACFA;EACE,oBAAA;AACF;ACFA;EACE,kBAAA;AACF;ACFA;EACE,eAAA;AACF","file":"extracted-B_rMTnx4.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n",".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n",".second {\\n  color: royalblue;\\n}\\n",".other-script {\\n  color: wheat;\\n}\\n",".nested-script {\\n  color: rebeccapurple;\\n}\\n",".nondynamic {\\n  color: deepskyblue;\\n}\\n",".nondynamic2 {\\n  color: deeppink;\\n}\\n"]}"`;
 
 exports[`code-splitting true: css 1`] = `
 ".first_partial {
   color: rosybrown;
 }
+
 .first_first {
   color: red;
 }
-/*# sourceMappingURL=first-C0UnfSPr.css.map */"
+/*# sourceMappingURL=first-CinPz4ld.css.map */"
 `;
 
 exports[`code-splitting true: css 2`] = `
@@ -2003,7 +2014,7 @@ exports[`code-splitting true: css 5`] = `
 `;
 
 exports[`code-splitting true: js 1`] = `
-"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n.first_first {\\n  color: red;\\n}";
+"var css = ".first_partial {\\n  color: rosybrown;\\n}\\n\\n.first_first {\\n  color: red;\\n}";
 var modules_efa96bb5 = {"partial":"first_partial","first":"first_first"};
 
 export { css, modules_efa96bb5 as default };
@@ -2016,7 +2027,7 @@ exports[`code-splitting true: js 2`] = `
 console.log("sub");
 
 (async () => {
-  const first = await import('./first-D0hqA3Xf.js');
+  const first = await import('./first-BDnHcd0U.js');
   const second = await import('./second-D5ePGhEs.js');
   const otherScript = await import('./other-script-CdSNSsfp.js');
   console.log(first, second, otherScript);
@@ -2055,7 +2066,7 @@ export { css, modules_7a038d99 as default };
 "
 `;
 
-exports[`code-splitting true: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAgB;AAClB;ACAA;EACE,UAAA;AAAF","file":"first-C0UnfSPr.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@import \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
+exports[`code-splitting true: map 1`] = `"{"version":3,"sources":["../../../../code-splitting/partial.css","../../../../code-splitting/first.scss"],"names":[],"mappings":"AAAA;EACE,gBAAA;ACCF;;AAAA;EACE,UAAA;AAGF","file":"first-CinPz4ld.css","sourcesContent":[".partial {\\n  color: rosybrown;\\n}\\n","@use \\"./partial.css\\";\\n\\n.first {\\n  color: red;\\n}\\n"]}"`;
 
 exports[`code-splitting true: map 2`] = `"{"version":3,"sources":["../../../../code-splitting/third.scss","../../../../code-splitting/fourth.scss","../../../../code-splitting/sub/first.scss"],"names":[],"mappings":"AAAA;EACE,aAAA;AACF;ACFA;EACE,cAAA;AACF;ACFA;EACE,YAAA;AACF","file":"index-dtPNF0rD.css","sourcesContent":[".third {\\n  color: maroon;\\n}\\n",".fourth {\\n  color: magenta;\\n}\\n",".first_sub {\\n  color: black;\\n}\\n"]}"`;
 
@@ -4091,250 +4102,12 @@ for (const name of Object.values(modules_5a199c00)) {
 
 exports[`modules named-exports-treeshakeable-fail 1`] = `"\`inject.treeshakeable\` option is incompatible with \`namedExports\` option"`;
 
-exports[`multiple-instances already-processed: js 1`] = `
-"/** @type {HTMLElement[]} */
-var containers = [];
-/** @type {{prepend:HTMLStyleElement,append:HTMLStyleElement}[]} */
-var styleTags = [];
-
-/**
- * @param {string} css
- * @param {object} options
- * @param {boolean} [options.prepend]
- * @param {boolean} [options.singleTag]
- * @param {string} [options.container]
- * @param {Record<string,string>} [options.attributes]
- * @returns {void}
- */
-function injector_8784c4d6 (css, options) {
-  if (!css || typeof document === "undefined") return;
-
-  var position = options.prepend === true ? "prepend" : "append";
-  var singleTag = options.singleTag === true;
-
-  var container =
-    typeof options.container === "string"
-      ? document.querySelector(options.container)
-      : document.getElementsByTagName("head")[0];
-
-  function createStyleTag() {
-    var styleTag = document.createElement("style");
-    styleTag.setAttribute("type", "text/css");
-    if (options.attributes) {
-      var k = Object.keys(options.attributes);
-      for (var i = 0; i < k.length; i++) {
-        styleTag.setAttribute(k[i], options.attributes[k[i]]);
-      }
-    }
-    var pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag);
-    return styleTag;
-  }
-
-  /** @type {HTMLStyleElement} */
-  var styleTag;
-
-  if (singleTag) {
-    var id = containers.indexOf(container);
-
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-
-    if (styleTags[id] && styleTags[id][position]) {
-      styleTag = styleTags[id][position];
-    } else {
-      styleTag = styleTags[id][position] = createStyleTag();
-    }
-  } else {
-    styleTag = createStyleTag();
-  }
-
-  // strip potential UTF-8 BOM if css was read from a file
-  if (css.charCodeAt(0) === 0xfeff) css = css.substring(1);
-
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.appendChild(document.createTextNode(css));
-  }
-}
-
-var css = ".bar_less {\\n  color: magenta;\\n}\\n";
-var less = "bar_less";
-var modules_b74a0081 = {"less":"bar_less"};
-injector_8784c4d6(css,{});
-
-export { css, modules_b74a0081 as default, less };
-"
-`;
-
-exports[`multiple-instances default: js 1`] = `
-"/** @type {HTMLElement[]} */
-var containers = [];
-/** @type {{prepend:HTMLStyleElement,append:HTMLStyleElement}[]} */
-var styleTags = [];
-
-/**
- * @param {string} css
- * @param {object} options
- * @param {boolean} [options.prepend]
- * @param {boolean} [options.singleTag]
- * @param {string} [options.container]
- * @param {Record<string,string>} [options.attributes]
- * @returns {void}
- */
-function injector_006bd99c (css, options) {
-  if (!css || typeof document === "undefined") return;
-
-  var position = options.prepend === true ? "prepend" : "append";
-  var singleTag = options.singleTag === true;
-
-  var container =
-    typeof options.container === "string"
-      ? document.querySelector(options.container)
-      : document.getElementsByTagName("head")[0];
-
-  function createStyleTag() {
-    var styleTag = document.createElement("style");
-    styleTag.setAttribute("type", "text/css");
-    if (options.attributes) {
-      var k = Object.keys(options.attributes);
-      for (var i = 0; i < k.length; i++) {
-        styleTag.setAttribute(k[i], options.attributes[k[i]]);
-      }
-    }
-    var pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag);
-    return styleTag;
-  }
-
-  /** @type {HTMLStyleElement} */
-  var styleTag;
-
-  if (singleTag) {
-    var id = containers.indexOf(container);
-
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-
-    if (styleTags[id] && styleTags[id][position]) {
-      styleTag = styleTags[id][position];
-    } else {
-      styleTag = styleTags[id][position] = createStyleTag();
-    }
-  } else {
-    styleTag = createStyleTag();
-  }
-
-  // strip potential UTF-8 BOM if css was read from a file
-  if (css.charCodeAt(0) === 0xfeff) css = css.substring(1);
-
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.appendChild(document.createTextNode(css));
-  }
-}
-
-var css$2 = ".style {\\n  color: red;\\n}\\n";
-injector_006bd99c(css$2,{});
-
-var css$1 = ".less {\\n  color: magenta;\\n}\\n";
-injector_006bd99c(css$1,{});
-
-var css = ".mod_mod {\\n  color: royalblue;\\n}\\n";
-var modules_507361ee = {"mod":"mod_mod"};
-injector_006bd99c(css,{});
-
-console.log(modules_507361ee);
-"
-`;
-
 exports[`on-extract-fn: js 1`] = `
 "var css$1 = ".foo {\\n  color: red;\\n}\\n";
 
 var css = ".bar {\\n  color: red;\\n}\\n";
 
 console.log(css$1, css);
-"
-`;
-
-exports[`sass data: js 1`] = `
-"/** @type {HTMLElement[]} */
-var containers = [];
-/** @type {{prepend:HTMLStyleElement,append:HTMLStyleElement}[]} */
-var styleTags = [];
-
-/**
- * @param {string} css
- * @param {object} options
- * @param {boolean} [options.prepend]
- * @param {boolean} [options.singleTag]
- * @param {string} [options.container]
- * @param {Record<string,string>} [options.attributes]
- * @returns {void}
- */
-function injector_f31f2858 (css, options) {
-  if (!css || typeof document === "undefined") return;
-
-  var position = options.prepend === true ? "prepend" : "append";
-  var singleTag = options.singleTag === true;
-
-  var container =
-    typeof options.container === "string"
-      ? document.querySelector(options.container)
-      : document.getElementsByTagName("head")[0];
-
-  function createStyleTag() {
-    var styleTag = document.createElement("style");
-    styleTag.setAttribute("type", "text/css");
-    if (options.attributes) {
-      var k = Object.keys(options.attributes);
-      for (var i = 0; i < k.length; i++) {
-        styleTag.setAttribute(k[i], options.attributes[k[i]]);
-      }
-    }
-    var pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag);
-    return styleTag;
-  }
-
-  /** @type {HTMLStyleElement} */
-  var styleTag;
-
-  if (singleTag) {
-    var id = containers.indexOf(container);
-
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-
-    if (styleTags[id] && styleTags[id][position]) {
-      styleTag = styleTags[id][position];
-    } else {
-      styleTag = styleTags[id][position] = createStyleTag();
-    }
-  } else {
-    styleTag = createStyleTag();
-  }
-
-  // strip potential UTF-8 BOM if css was read from a file
-  if (css.charCodeAt(0) === 0xfeff) css = css.substring(1);
-
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.appendChild(document.createTextNode(css));
-  }
-}
-
-var css = ".data {\\n  color: red;\\n}";
-injector_f31f2858(css,{});
 "
 `;
 
@@ -4410,81 +4183,6 @@ function injector_ea22477b (css, options) {
 
 var css = ".style {\\n  width: 30%;\\n  color: red;\\n}";
 injector_ea22477b(css,{});
-"
-`;
-
-exports[`sass import: js 1`] = `
-"/** @type {HTMLElement[]} */
-var containers = [];
-/** @type {{prepend:HTMLStyleElement,append:HTMLStyleElement}[]} */
-var styleTags = [];
-
-/**
- * @param {string} css
- * @param {object} options
- * @param {boolean} [options.prepend]
- * @param {boolean} [options.singleTag]
- * @param {string} [options.container]
- * @param {Record<string,string>} [options.attributes]
- * @returns {void}
- */
-function injector_f31f2858 (css, options) {
-  if (!css || typeof document === "undefined") return;
-
-  var position = options.prepend === true ? "prepend" : "append";
-  var singleTag = options.singleTag === true;
-
-  var container =
-    typeof options.container === "string"
-      ? document.querySelector(options.container)
-      : document.getElementsByTagName("head")[0];
-
-  function createStyleTag() {
-    var styleTag = document.createElement("style");
-    styleTag.setAttribute("type", "text/css");
-    if (options.attributes) {
-      var k = Object.keys(options.attributes);
-      for (var i = 0; i < k.length; i++) {
-        styleTag.setAttribute(k[i], options.attributes[k[i]]);
-      }
-    }
-    var pos = position === "prepend" ? "afterbegin" : "beforeend";
-    container.insertAdjacentElement(pos, styleTag);
-    return styleTag;
-  }
-
-  /** @type {HTMLStyleElement} */
-  var styleTag;
-
-  if (singleTag) {
-    var id = containers.indexOf(container);
-
-    if (id === -1) {
-      id = containers.push(container) - 1;
-      styleTags[id] = {};
-    }
-
-    if (styleTags[id] && styleTags[id][position]) {
-      styleTag = styleTags[id][position];
-    } else {
-      styleTag = styleTags[id][position] = createStyleTag();
-    }
-  } else {
-    styleTag = createStyleTag();
-  }
-
-  // strip potential UTF-8 BOM if css was read from a file
-  if (css.charCodeAt(0) === 0xfeff) css = css.substring(1);
-
-  if (styleTag.styleSheet) {
-    styleTag.styleSheet.cssText += css;
-  } else {
-    styleTag.appendChild(document.createTextNode(css));
-  }
-}
-
-var css = ".a {\\n  color: magenta;\\n}\\n\\n.b {\\n  color: red;\\n}\\n\\n.c {\\n  color: red;\\n}\\n\\n.foo {\\n  color: royalblue;\\n}\\n\\n/*! minireset.css v0.0.7 | MIT License | github.com/jgthms/minireset.css */\\nhtml, body, p, ol, ul, li, dl, dt, dd, blockquote, figure, fieldset, legend, textarea, pre, iframe, hr, h1, h2, h3, h4, h5, h6 {\\n  margin: 0;\\n  padding: 0;\\n}\\n\\nh1, h2, h3, h4, h5, h6 {\\n  font-size: 100%;\\n  font-weight: normal;\\n}\\n\\nul {\\n  list-style: none;\\n}\\n\\nbutton, input, select {\\n  margin: 0;\\n}\\n\\nhtml {\\n  box-sizing: border-box;\\n}\\n\\n*, *::before, *::after {\\n  box-sizing: inherit;\\n}\\n\\nimg, video {\\n  height: auto;\\n  max-width: 100%;\\n}\\n\\niframe {\\n  border: 0;\\n}\\n\\ntable {\\n  border-collapse: collapse;\\n  border-spacing: 0;\\n}\\n\\ntd, th {\\n  padding: 0;\\n}";
-injector_f31f2858(css,{});
 "
 `;
 

@@ -1,6 +1,6 @@
 import { SourceMapGenerator } from "source-map-js";
-import { Extracted } from "../loaders/types";
-import { mm } from "./sourcemap";
+import type { Extracted } from "../loaders/types.js";
+import { mm } from "./sourcemap.js";
 
 interface Concatenated {
   css: string;
