@@ -73,16 +73,6 @@ export default (options: Options = {}): Plugin => {
       // Skip empty files
       if (code.replaceAll(/\s/g, "") === "") return null;
 
-      // Check if file was already processed into JS
-      // by other instance(s) of this or other plugin(s)
-      try {
-        this.parse(code, {}); // If it doesn't throw...
-        this.warn(`Skipping processed file ${humanlizePath(id)}`);
-        return null;
-      } catch {
-        // Was not already processed, continuing
-      }
-
       if (typeof options.onImport === "function") options.onImport(code, id);
 
       const ctx: LoaderContext = {
