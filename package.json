@@ -79,7 +79,6 @@
     "@commitlint/config-angular": "^20.2.0",
     "@commitlint/prompt-cli": "^20.2.0",
     "@eslint/compat": "^2.0.0",
-    "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^10.0.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^29.0.0",
@@ -132,7 +131,6 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "ajv": ">=8.18.0",
     "glob": ">=13.0.3",
     "minimatch": ">=10.2.1",
     "semver": ">=7.7.4",
