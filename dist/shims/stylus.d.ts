@@ -33,7 +33,5 @@ declare namespace stylus {
     };
   }
 
-  interface Stylus {
-    (code: string, options?: Options): Renderer;
-  }
+  type Stylus = (code: string, options?: Options) => Renderer;
 }

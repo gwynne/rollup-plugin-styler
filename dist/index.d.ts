@@ -4,125 +4,10 @@
 /// <reference types="./shims/stylus" />
 import * as rollup from 'rollup';
 import { Plugin } from 'rollup';
-import * as postcss from 'postcss';
 import { Options as Options$1 } from 'cssnano';
-import { StringOptions } from 'sass/types/options';
+import * as postcss from 'postcss';
+import { StringOptions } from 'sass-embedded';
 import { RawSourceMap } from 'source-map-js';
-
-/** File resolved by `@import` resolver */
-interface ImportFile {
-    /** Absolute path to file */
-    from: string;
-    /** File source */
-    source: Uint8Array;
-}
-/** `@import` resolver */
-type ImportResolve = (url: string, basedir: string, extensions: string[]) => Promise<ImportFile>;
-
-/** `@import` handler options */
-interface ImportOptions {
-    /**
-     * Provide custom resolver for imports
-     * in place of the default one
-     */
-    resolve?: ImportResolve;
-    /**
-     * Aliases for import paths.
-     * Overrides the global `alias` option.
-     * - ex.: `{"foo":"bar"}`
-     */
-    alias?: Record<string, string>;
-    /**
-     * Import files ending with these extensions.
-     * Overrides the global `extensions` option.
-     * @default [".css", ".pcss", ".postcss", ".sss"]
-     */
-    extensions?: string[];
-}
-
-/** File resolved by URL resolver */
-interface UrlFile {
-    /** Absolute path to file */
-    from: string;
-    /** File source */
-    source: Uint8Array;
-    /** Original query extracted from the input path */
-    urlQuery?: string;
-}
-/** URL resolver */
-type UrlResolve = (inputUrl: string, basedir: string) => Promise<UrlFile>;
-
-/** URL handler options */
-interface UrlOptions {
-    /**
-     * Inline files instead of copying
-     * @default true for `inject` mode, otherwise false
-     */
-    inline?: boolean;
-    /**
-     * Public Path for URLs in CSS files
-     * @default "./"
-     */
-    publicPath?: string;
-    /**
-     * Directory path for outputted CSS assets,
-     * which is not included into resulting URL
-     * @default "."
-     */
-    assetDir?: string;
-    /**
-     * Enable/disable name generation with hash for outputted CSS assets
-     * or provide your own placeholder with the following blocks:
-     * - `[extname]`: The file extension of the asset including a leading dot, e.g. `.png`.
-     * - `[ext]`: The file extension without a leading dot, e.g. `png`.
-     * - `[hash(:<num>)]`: A hash based on the name and content of the asset (with optional length).
-     * - `[name]`: The file name of the asset excluding any extension.
-     *
-     * Forward slashes / can be used to place files in sub-directories.
-     * @default "assets/[name]-[hash][extname]" ("assets/[name][extname]" if false)
-     */
-    hash?: boolean | string;
-    /**
-     * Mappings of file extensions to `assetDir` subdirectories. Dynamically affects `publicPath`.
-     * Extensions should be specified without leading dots. Files whose extensions do not appear
-     * in the mapping are placed directly in the assetDir.
-     */
-    fileExtensionPathMappings?: Record<string, string>;
-    /**
-     * Provide custom resolver for URLs
-     * in place of the default one
-     */
-    resolve?: UrlResolve;
-    /**
-     * Aliases for URL paths.
-     * Overrides the global `alias` option.
-     * - ex.: `{"foo":"bar"}`
-     */
-    alias?: Record<string, string>;
-}
-
-/** Options for [CSS Modules](https://github.com/css-modules/css-modules) */
-interface ModulesOptions {
-    /**
-     * Default mode for classes
-     * @default "local"
-     */
-    mode?: "local" | "global" | "pure";
-    /** Fail on wrong order of composition */
-    failOnWrongOrder?: boolean;
-    /** Export global classes */
-    exportGlobals?: boolean;
-    /**
-     * Placeholder or function for scoped name generation.
-     * Allowed blocks for placeholder:
-     * - `[dir]`: The directory name of the asset.
-     * - `[name]`: The file name of the asset excluding any extension.
-     * - `[local]`: The original value of the selector.
-     * - `[hash(:<num>)]`: A hash based on the name and content of the asset (with optional length).
-     * @default "[name]_[local]__[hash:8]"
-     */
-    generateScopedName?: string | ((name: string, file: string, css: string) => string);
-}
 
 /**
  * Loader
@@ -195,8 +80,127 @@ interface SourceMapOptions {
     transform?: (map: RawSourceMap, name?: string) => void;
 }
 
+/** Options for Less loader */
+interface LESSLoaderOptions extends Record<string, unknown>, Less.Options {
+}
+
+/** File resolved by `@import` resolver */
+interface ImportFile {
+    /** Absolute path to file */
+    from: string;
+    /** File source */
+    source: Uint8Array;
+}
+/** `@import` resolver */
+type ImportResolve = (url: string, basedir: string, extensions: string[]) => Promise<ImportFile>;
+
+/** `@import` handler options */
+interface ImportOptions {
+    /**
+     * Provide custom resolver for imports
+     * in place of the default one
+     */
+    resolve?: ImportResolve;
+    /**
+     * Aliases for import paths.
+     * Overrides the global `alias` option.
+     * - ex.: `{"foo":"bar"}`
+     */
+    alias?: Record<string, string>;
+    /**
+     * Import files ending with these extensions.
+     * Overrides the global `extensions` option.
+     * @default [".css", ".pcss", ".postcss", ".sss"]
+     */
+    extensions?: string[];
+}
+
+/** Options for [CSS Modules](https://github.com/css-modules/css-modules) */
+interface ModulesOptions {
+    /**
+     * Default mode for classes
+     * @default "local"
+     */
+    mode?: "local" | "global" | "pure";
+    /** Fail on wrong order of composition */
+    failOnWrongOrder?: boolean;
+    /** Export global classes */
+    exportGlobals?: boolean;
+    /**
+     * Placeholder or function for scoped name generation.
+     * Allowed blocks for placeholder:
+     * - `[dir]`: The directory name of the asset.
+     * - `[name]`: The file name of the asset excluding any extension.
+     * - `[local]`: The original value of the selector.
+     * - `[hash(:<num>)]`: A hash based on the name and content of the asset (with optional length).
+     * @default "[name]_[local]__[hash:8]"
+     */
+    generateScopedName?: string | ((name: string, file: string, css: string) => string);
+}
+
+/** File resolved by URL resolver */
+interface UrlFile {
+    /** Absolute path to file */
+    from: string;
+    /** File source */
+    source: Uint8Array;
+    /** Original query extracted from the input path */
+    urlQuery?: string;
+}
+/** URL resolver */
+type UrlResolve = (inputUrl: string, basedir: string) => Promise<UrlFile>;
+
+/** URL handler options */
+interface UrlOptions {
+    /**
+     * Inline files instead of copying
+     * @default true for `inject` mode, otherwise false
+     */
+    inline?: boolean;
+    /**
+     * Public Path for URLs in CSS files
+     * @default "./"
+     */
+    publicPath?: string;
+    /**
+     * Directory path for outputted CSS assets,
+     * which is not included into resulting URL
+     * @default "."
+     */
+    assetDir?: string;
+    /**
+     * Enable/disable name generation with hash for outputted CSS assets
+     * or provide your own placeholder with the following blocks:
+     * - `[extname]`: The file extension of the asset including a leading dot, e.g. `.png`.
+     * - `[ext]`: The file extension without a leading dot, e.g. `png`.
+     * - `[hash(:<num>)]`: A hash based on the name and content of the asset (with optional length).
+     * - `[name]`: The file name of the asset excluding any extension.
+     *
+     * Forward slashes / can be used to place files in sub-directories.
+     * @default "assets/[name]-[hash][extname]" ("assets/[name][extname]" if false)
+     */
+    hash?: boolean | string;
+    /**
+     * Mappings of file extensions to `assetDir` subdirectories. Dynamically affects `publicPath`.
+     * Extensions should be specified without leading dots. Files whose extensions do not appear
+     * in the mapping are placed directly in the assetDir.
+     */
+    fileExtensionPathMappings?: Record<string, string>;
+    /**
+     * Provide custom resolver for URLs
+     * in place of the default one
+     */
+    resolve?: UrlResolve;
+    /**
+     * Aliases for URL paths.
+     * Overrides the global `alias` option.
+     * - ex.: `{"foo":"bar"}`
+     */
+    alias?: Record<string, string>;
+}
+
 type Type = "sync" | "async";
-interface PublicOptions<T extends Type = Type> extends Pick<StringOptions<T>, "url" | "charset" | "loadPaths" | "importers" | "style" | "syntax" | "quietDeps" | "fatalDeprecations" | "futureDeprecations" | "silenceDeprecations" | "verbose"> {
+interface PublicOptions<T extends Type = Type> extends Pick<StringOptions<T>, "url" | "charset" | "loadPaths" | "importers" | "style" | "syntax" | "quietDeps" | "fatalDeprecations" | "futureDeprecations" | "sourceMapIncludeSources" | "silenceDeprecations" | "verbose"> {
 }
 
 /** Options for Sass loader */
@@ -205,10 +209,6 @@ interface SASSLoaderOptions extends Record<string, unknown>, PublicOptions {
     impl?: string;
     /** Forcefully enable/disable sync mode */
     sync?: boolean;
-}
-
-/** Options for Less loader */
-interface LESSLoaderOptions extends Record<string, unknown>, Less.Options {
 }
 
 /** Options for Stylus loader */

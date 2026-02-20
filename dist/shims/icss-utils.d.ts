@@ -1,5 +1,5 @@
 declare module "icss-utils" {
-  import { Container } from "postcss";
+  import type { Container } from "postcss";
 
   export type Replacements = Record<string, string>;
   export type CSSImports = Record<string, Record<string, string>>;

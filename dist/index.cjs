@@ -4,22 +4,22 @@ var path = require('node:path');
 var pluginutils = require('@rollup/pluginutils');
 var cssnano = require('cssnano');
 var fs = require('fs-extra');
-var postcss = require('postcss');
-var sourceMapJs = require('source-map-js');
+var node_url = require('node:url');
 var resolver = require('resolve');
 var resolve_exports = require('resolve.exports');
-var node_url = require('node:url');
+var postcss = require('postcss');
 var node_crypto = require('node:crypto');
+var sourceMapJs = require('source-map-js');
 var cosmiconfig = require('cosmiconfig');
 var node_module = require('node:module');
+var icssUtils = require('icss-utils');
 var valueParser = require('postcss-value-parser');
 var qs = require('query-string');
-var mimeTypes = require('mime-types');
-var modulesValues = require('postcss-modules-values');
-var localByDefault = require('postcss-modules-local-by-default');
 var extractImports = require('postcss-modules-extract-imports');
+var localByDefault = require('postcss-modules-local-by-default');
 var modulesScope = require('postcss-modules-scope');
-var icssUtils = require('icss-utils');
+var modulesValues = require('postcss-modules-values');
+var mimeTypes = require('mime-types');
 
 var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
 const isAbsolutePath = path => /^(?:\/|(?:[A-Za-z]:)?[/\\|])/.test(path);
@@ -32,80 +32,6 @@ function normalizePath(...paths) {
 const resolvePath = (...paths) => normalizePath(path.resolve(...paths));
 const relativePath = (from, to) => normalizePath(path.relative(from, to));
 const humanlizePath = file => relativePath(process.cwd(), file);
-
-const hashRe = /\[hash(?::(\d+))?]/;
-const firstExtRe = /(?<!^|[/\\])(\.[^\s.]+)/i;
-const dataURIRe = /data:[^\n\r;]+?(?:;charset=[^\n\r;]+?)?;base64,([\d+/A-Za-z]+={0,2})/;
-
-const mapBlockRe = /(?:\n|\r\n)?\/\*[#*@]+?\s*?sourceMappingURL\s*?=\s*?(\S+)\s*?\*+?\//gm;
-const mapLineRe = /(?:\n|\r\n)?\/\/[#@]+?\s*?sourceMappingURL\s*?=\s*?(\S+)\s*?$/gm;
-async function getMap(code, id) {
-  const [, data] = mapBlockRe.exec(code) ?? mapLineRe.exec(code) ?? [];
-  if (!data) return;
-  const [, uriMap] = dataURIRe.exec(data) ?? [];
-  if (uriMap) return Buffer.from(uriMap, "base64").toString();
-  if (!id) throw new Error("Extracted map detected, but no ID is provided");
-  const mapFileName = path.resolve(path.dirname(id), data);
-  const exists = await fs.pathExists(mapFileName);
-  if (!exists) return;
-  return fs.readFile(mapFileName, "utf8");
-}
-const stripMap = code => code.replaceAll(mapBlockRe, "").replaceAll(mapLineRe, "");
-class MapModifier {
-  map;
-  constructor(map) {
-    if (typeof map === "string") try {
-      this.map = JSON.parse(map);
-    } catch {
-      /* noop */
-    } else this.map = map;
-  }
-  modify(f) {
-    if (!this.map) return this;
-    f(this.map);
-    return this;
-  }
-  modifySources(op) {
-    if (!this.map) return this;
-    if (this.map.sources) this.map.sources = this.map.sources.map(s => op(s));
-    return this;
-  }
-  resolve(dir = process.cwd()) {
-    return this.modifySources(source => {
-      if (source === "<no source>") return source;
-      return resolvePath(dir, source);
-    });
-  }
-  relative(dir = process.cwd()) {
-    return this.modifySources(source => {
-      if (source === "<no source>") return source;
-      if (isAbsolutePath(source)) return relativePath(dir, source);
-      return normalizePath(source);
-    });
-  }
-  toObject() {
-    return this.map;
-  }
-  toString() {
-    if (!this.map) return this.map;
-    return JSON.stringify(this.map);
-  }
-  toConsumer() {
-    if (!this.map) return this.map;
-    return new sourceMapJs.SourceMapConsumer(this.map);
-  }
-  toCommentData() {
-    const map = this.toString();
-    if (!map) return "";
-    const sourceMapData = Buffer.from(map).toString("base64");
-    return `\n/*# sourceMappingURL=data:application/json;base64,${sourceMapData} */`;
-  }
-  toCommentFile(fileName) {
-    if (!this.map) return "";
-    return `\n/*# sourceMappingURL=${fileName} */`;
-  }
-}
-const mm = map => new MapModifier(map);
 
 var arrayFmt = arr => arr.map((id, i, arr) => {
   const fmt = `\`${id}\``;
@@ -213,12 +139,161 @@ function resolveSync(ids, userOpts) {
   throw new Error(`${options.caller} could not resolve ${arrayFmt(ids)}`);
 }
 
+const isModule = url => /^~[\d@A-Za-z]/.test(url);
+function getUrlOfPartial(url) {
+  const {
+    dir,
+    base
+  } = path.parse(url);
+  return dir ? `${normalizePath(dir)}/_${base}` : `_${base}`;
+}
+function normalizeUrl(url) {
+  if (isModule(url)) return normalizePath(url.slice(1));
+  if (isAbsolutePath(url) || isRelativePath(url)) return normalizePath(url);
+  return `./${normalizePath(url)}`;
+}
+
+const extensions$1 = [".less", ".css"];
+const getStylesFileManager = less => new class extends less.FileManager {
+  supports() {
+    return true;
+  }
+  async loadFile(filename, filedir, opts) {
+    const url = normalizeUrl(filename);
+    const partialUrl = getUrlOfPartial(url);
+    const options = {
+      caller: "Less importer",
+      basedirs: [filedir],
+      extensions: extensions$1
+    };
+    if (opts.paths) options.basedirs.push(...opts.paths);
+    // Give precedence to importing a partial
+    const id = await resolveAsync([partialUrl, url], options);
+    return {
+      filename: id,
+      contents: await fs.readFile(id, "utf8")
+    };
+  }
+}();
+const importer$1 = {
+  install(less, pluginManager) {
+    pluginManager.addFileManager(getStylesFileManager(less));
+  }
+};
+
+const loader$4 = {
+  name: "less",
+  test: /\.less$/i,
+  async process({
+    code,
+    map
+  }) {
+    const options = {
+      ...this.options
+    };
+    const less = await import('less').then(m => m.default);
+    if (!less) throw new Error("You need to install `less` package in order to process Less files");
+    const plugins = [importer$1];
+    if (options.plugins) plugins.push(...options.plugins);
+    const res = await less.render(code, {
+      ...options,
+      plugins,
+      filename: this.id,
+      sourceMap: {
+        outputSourceFiles: true,
+        sourceMapBasepath: path.dirname(this.id),
+        disableSourcemapAnnotation: true
+      }
+    });
+    const deps = res.imports;
+    for (const dep of deps) this.deps.add(normalizePath(dep));
+    return {
+      code: res.css,
+      map: res.map ?? map
+    };
+  }
+};
+
 var hasher = data => node_crypto.createHash("sha256").update(data).digest("hex");
 
 var safeId = (id, ...salt) => {
   const hash = hasher([id, "0iOXBLSx", ...salt].join(":")).slice(0, 8);
   return pluginutils.makeLegalIdentifier(`${id}_${hash}`);
 };
+
+const hashRe = /\[hash(?::(\d+))?]/;
+const firstExtRe = /(?<!^|[/\\])(\.[^\s.]+)/i;
+const dataURIRe = /data:[^\n\r;]+?(?:;charset=[^\n\r;]+?)?;base64,([\d+/A-Za-z]+={0,2})/;
+
+const mapBlockRe = /(?:\n|\r\n)?\/\*[#*@]+?\s*?sourceMappingURL\s*?=\s*?(\S+)\s*?\*+?\//gm;
+const mapLineRe = /(?:\n|\r\n)?\/\/[#@]+?\s*?sourceMappingURL\s*?=\s*?(\S+)\s*?$/gm;
+async function getMap(code, id) {
+  const [, data] = mapBlockRe.exec(code) ?? mapLineRe.exec(code) ?? [];
+  if (!data) return;
+  const [, uriMap] = dataURIRe.exec(data) ?? [];
+  if (uriMap) return Buffer.from(uriMap, "base64").toString();
+  if (!id) throw new Error("Extracted map detected, but no ID is provided");
+  const mapFileName = path.resolve(path.dirname(id), data);
+  const exists = await fs.pathExists(mapFileName);
+  if (!exists) return;
+  return fs.readFile(mapFileName, "utf8");
+}
+const stripMap = code => code.replaceAll(mapBlockRe, "").replaceAll(mapLineRe, "");
+class MapModifier {
+  map;
+  constructor(map) {
+    if (typeof map === "string") try {
+      this.map = JSON.parse(map);
+    } catch {
+      /* noop */
+    } else this.map = map;
+  }
+  modify(f) {
+    if (!this.map) return this;
+    f(this.map);
+    return this;
+  }
+  modifySources(op) {
+    if (!this.map) return this;
+    if (this.map.sources) this.map.sources = this.map.sources.map(s => op(s));
+    return this;
+  }
+  resolve(dir = process.cwd()) {
+    return this.modifySources(source => {
+      if (source === "<no source>") return source;
+      return resolvePath(dir, source);
+    });
+  }
+  relative(dir = process.cwd()) {
+    return this.modifySources(source => {
+      if (source === "<no source>") return source;
+      if (isAbsolutePath(source)) return relativePath(dir, source);
+      return normalizePath(source);
+    });
+  }
+  toObject() {
+    return this.map;
+  }
+  toString() {
+    if (!this.map) return this.map;
+    return JSON.stringify(this.map);
+  }
+  toConsumer() {
+    if (!this.map) return this.map;
+    return new sourceMapJs.SourceMapConsumer(this.map);
+  }
+  toCommentData() {
+    const map = this.toString();
+    if (!map) return "";
+    const sourceMapData = Buffer.from(map).toString("base64");
+    return `\n/*# sourceMappingURL=data:application/json;base64,${sourceMapData} */`;
+  }
+  toCommentFile(fileName) {
+    if (!this.map) return "";
+    return `\n/*# sourceMappingURL=${fileName} */`;
+  }
+}
+const mm = map => new MapModifier(map);
 
 const require$1 = node_module.createRequire((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('index.cjs', document.baseURI).href)));
 const loaded = {};
@@ -331,7 +406,7 @@ async function loadConfig (id, config) {
     stringifier
   } = typeof found.config === "function" ? found.config({
     cwd: process.cwd(),
-    env: process.env["NODE_ENV"] ?? "development",
+    env: "production",
     file: {
       extname: ext,
       dirname: dir,
@@ -349,7 +424,76 @@ async function loadConfig (id, config) {
   return result;
 }
 
-const resolve$2 = async (inputUrl, basedir, extensions) => {
+const load = async (url, file, extensions, processor, opts) => {
+  const options = {
+    caller: "ICSS loader",
+    basedirs: [path.dirname(file)],
+    extensions
+  };
+  const from = await resolveAsync([url, `./${url}`], options);
+  const source = await fs.readFile(from);
+  const {
+    messages
+  } = await processor.process(source, {
+    ...opts,
+    from
+  });
+  const exports$1 = {};
+  for (const msg of messages) {
+    if (msg.type !== "icss") continue;
+    Object.assign(exports$1, msg.export);
+  }
+  return exports$1;
+};
+
+async function resolve$2 (icssImports, load, file, extensions, processor, opts) {
+  const imports = {};
+  for await (const [url, values] of Object.entries(icssImports)) {
+    const exports$1 = await load(url, file, extensions, processor, opts);
+    for (const [k, v] of Object.entries(values)) {
+      imports[k] = exports$1[v];
+    }
+  }
+  return imports;
+}
+
+const name$3 = "styles-icss";
+const extensionsDefault$1 = [".css", ".pcss", ".postcss", ".sss"];
+const plugin$3 = (options = {}) => {
+  const load$1 = options.load ?? load;
+  const extensions = options.extensions ?? extensionsDefault$1;
+  return {
+    postcssPlugin: name$3,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    async OnceExit(css, {
+      result: res
+    }) {
+      if (!css.source?.input.file) return;
+      const opts = {
+        ...res.opts
+      };
+      delete opts.map;
+      const {
+        icssImports,
+        icssExports
+      } = icssUtils.extractICSS(css);
+      const imports = await resolve$2(icssImports, load$1, css.source.input.file, extensions, res.processor, opts);
+      icssUtils.replaceSymbols(css, imports);
+      for (const [k, v] of Object.entries(icssExports)) {
+        res.messages.push({
+          plugin: name$3,
+          type: "icss",
+          export: {
+            [k]: icssUtils.replaceValueSymbols(v, imports)
+          }
+        });
+      }
+    }
+  };
+};
+plugin$3.postcss = true;
+
+const resolve$1 = async (inputUrl, basedir, extensions) => {
   const options = {
     caller: "@import resolver",
     basedirs: [basedir],
@@ -370,14 +514,14 @@ const resolve$2 = async (inputUrl, basedir, extensions) => {
   };
 };
 
-const name$3 = "styles-import";
-const extensionsDefault$1 = [".css", ".pcss", ".postcss", ".sss"];
-const plugin$3 = (options = {}) => {
-  const resolve = options.resolve ?? resolve$2;
+const name$2 = "styles-import";
+const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];
+const plugin$2 = (options = {}) => {
+  const resolve = options.resolve ?? resolve$1;
   const alias = options.alias ?? {};
-  const extensions = options.extensions ?? extensionsDefault$1;
+  const extensions = options.extensions ?? extensionsDefault;
   return {
-    postcssPlugin: name$3,
+    postcssPlugin: name$2,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     async Once(css, {
       result: res
@@ -463,12 +607,12 @@ const plugin$3 = (options = {}) => {
             rule.warn(res, `\`@import\` loop in \`${rule.toString()}\``);
             continue;
           }
-          const imported = await postcss(plugin$3(options)).process(source, {
+          const imported = await postcss(plugin$2(options)).process(source, {
             ...opts,
             from
           });
           res.messages.push(...imported.messages, {
-            plugin: name$3,
+            plugin: name$2,
             type: "dependency",
             file: from
           });
@@ -484,9 +628,62 @@ const plugin$3 = (options = {}) => {
     }
   };
 };
-plugin$3.postcss = true;
+plugin$2.postcss = true;
 
-const resolve$1 = async (inputUrl, basedir) => {
+var generateScopedNameDefault = (placeholder = "[name]_[local]__[hash:8]") => (local, file, css) => {
+  const {
+    dir,
+    name,
+    base
+  } = path.parse(file);
+  const hash = hasher(`${base}:${css}`);
+  const match = hashRe.exec(placeholder);
+  const hashLen = match && Number.parseInt(match[1], 10);
+  return pluginutils.makeLegalIdentifier(placeholder.replace("[dir]", path.basename(dir)).replace("[name]", name).replace("[local]", local).replace(hashRe, hashLen ? hash.slice(0, hashLen) : hash));
+};
+
+var postcssModules = options => {
+  const opts = {
+    mode: "local",
+    ...options,
+    generateScopedName: typeof options.generateScopedName === "function" ? options.generateScopedName : generateScopedNameDefault(options.generateScopedName)
+  };
+  return [modulesValues(), localByDefault({
+    mode: opts.mode
+  }), extractImports({
+    failOnWrongOrder: opts.failOnWrongOrder
+  }), modulesScope({
+    exportGlobals: opts.exportGlobals,
+    generateScopedName: opts.generateScopedName
+  })];
+};
+
+const name$1 = "styles-noop";
+const plugin$1 = () => ({
+  postcssPlugin: name$1
+});
+plugin$1.postcss = true;
+
+var generateName = (placeholder, file, source) => {
+  const {
+    dir,
+    name,
+    ext,
+    base
+  } = path.parse(file);
+  const hash = hasher(`${base}:${Buffer.from(source).toString()}`);
+  const match = hashRe.exec(placeholder);
+  const hashLen = match && Number.parseInt(match[1], 10);
+  return placeholder.replace("[dir]", path.basename(dir)).replace("[name]", name).replace("[extname]", ext).replace(".[ext]", ext).replace("[ext]", ext.slice(1)).replace(hashRe, hashLen ? hash.slice(0, hashLen) : hash.slice(0, 8));
+};
+
+var inlineFile = (file, source) => {
+  const mime = mimeTypes.lookup(file) || "application/octet-stream";
+  const data = Buffer.from(source).toString("base64");
+  return `data:${mime};base64,${data}`;
+};
+
+const resolve = async (inputUrl, basedir) => {
   const options = {
     caller: "URL resolver",
     basedirs: [basedir]
@@ -512,19 +709,6 @@ const resolve$1 = async (inputUrl, basedir) => {
     source: await fs.readFile(from),
     urlQuery
   };
-};
-
-var generateName = (placeholder, file, source) => {
-  const {
-    dir,
-    name,
-    ext,
-    base
-  } = path.parse(file);
-  const hash = hasher(`${base}:${Buffer.from(source).toString()}`);
-  const match = hashRe.exec(placeholder);
-  const hashLen = match && Number.parseInt(match[1]);
-  return placeholder.replace("[dir]", path.basename(dir)).replace("[name]", name).replace("[extname]", ext).replace(".[ext]", ext).replace("[ext]", ext.slice(1)).replace(hashRe, hashLen ? hash.slice(0, hashLen) : hash.slice(0, 8));
 };
 
 const urlFuncRe = /^url$/i;
@@ -555,32 +739,25 @@ const walkUrls = (parsed, callback) => {
           const [urlNode] = nodes;
           const url = urlNode?.type === "string" ? urlNode.value : valueParser.stringify(nodes);
           callback(url.replaceAll(/^\s+|\s+$/g, ""), urlNode);
-          continue;
         }
       }
     }
   });
 };
 
-var inlineFile = (file, source) => {
-  const mime = mimeTypes.lookup(file) || "application/octet-stream";
-  const data = Buffer.from(source).toString("base64");
-  return `data:${mime};base64,${data}`;
-};
-
-const name$2 = "styles-url";
+const name = "styles-url";
 const placeholderHashDefault = "assets/[name]-[hash][extname]";
 const placeholderNoHashDefault = "assets/[name][extname]";
-const plugin$2 = (options = {}) => {
+const plugin = (options = {}) => {
   const inline = options.inline ?? false;
   const publicPath = options.publicPath ?? "./";
   const assetDir = options.assetDir ?? ".";
   const fileExtMappings = options.fileExtensionPathMappings ?? {};
-  const resolve = options.resolve ?? resolve$1;
+  const resolve$1 = options.resolve ?? resolve;
   const alias = options.alias ?? {};
   const placeholder = options.hash ?? true ? typeof options.hash === "string" ? options.hash : placeholderHashDefault : placeholderNoHashDefault;
   return {
-    postcssPlugin: name$2,
+    postcssPlugin: name,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     async Once(css, {
       result: res
@@ -650,7 +827,7 @@ const plugin$2 = (options = {}) => {
         let resolved;
         for await (const basedir of basedirs) {
           try {
-            if (!resolved) resolved = await resolve(url, basedir);
+            if (!resolved) resolved = await resolve$1(url, basedir);
           } catch {
             /* noop */
           }
@@ -669,7 +846,7 @@ const plugin$2 = (options = {}) => {
           continue;
         }
         res.messages.push({
-          plugin: name$2,
+          plugin: name,
           type: "dependency",
           file: from
         });
@@ -691,7 +868,7 @@ const plugin$2 = (options = {}) => {
           if (urlQuery) node.value += urlQuery;
           to = normalizePath(assetDir, to);
           res.messages.push({
-            plugin: name$2,
+            plugin: name,
             type: "asset",
             to,
             source
@@ -703,109 +880,6 @@ const plugin$2 = (options = {}) => {
     }
   };
 };
-plugin$2.postcss = true;
-
-var generateScopedNameDefault = (placeholder = "[name]_[local]__[hash:8]") => (local, file, css) => {
-  const {
-    dir,
-    name,
-    base
-  } = path.parse(file);
-  const hash = hasher(`${base}:${css}`);
-  const match = hashRe.exec(placeholder);
-  const hashLen = match && Number.parseInt(match[1]);
-  return pluginutils.makeLegalIdentifier(placeholder.replace("[dir]", path.basename(dir)).replace("[name]", name).replace("[local]", local).replace(hashRe, hashLen ? hash.slice(0, hashLen) : hash));
-};
-
-var postcssModules = options => {
-  const opts = {
-    mode: "local",
-    ...options,
-    generateScopedName: typeof options.generateScopedName === "function" ? options.generateScopedName : generateScopedNameDefault(options.generateScopedName)
-  };
-  return [modulesValues(), localByDefault({
-    mode: opts.mode
-  }), extractImports({
-    failOnWrongOrder: opts.failOnWrongOrder
-  }), modulesScope({
-    exportGlobals: opts.exportGlobals,
-    generateScopedName: opts.generateScopedName
-  })];
-};
-
-const load = async (url, file, extensions, processor, opts) => {
-  const options = {
-    caller: "ICSS loader",
-    basedirs: [path.dirname(file)],
-    extensions
-  };
-  const from = await resolveAsync([url, `./${url}`], options);
-  const source = await fs.readFile(from);
-  const {
-    messages
-  } = await processor.process(source, {
-    ...opts,
-    from
-  });
-  const exports$1 = {};
-  for (const msg of messages) {
-    if (msg.type !== "icss") continue;
-    Object.assign(exports$1, msg.export);
-  }
-  return exports$1;
-};
-
-async function resolve (icssImports, load, file, extensions, processor, opts) {
-  const imports = {};
-  for await (const [url, values] of Object.entries(icssImports)) {
-    const exports$1 = await load(url, file, extensions, processor, opts);
-    for (const [k, v] of Object.entries(values)) {
-      imports[k] = exports$1[v];
-    }
-  }
-  return imports;
-}
-
-const name$1 = "styles-icss";
-const extensionsDefault = [".css", ".pcss", ".postcss", ".sss"];
-const plugin$1 = (options = {}) => {
-  const load$1 = options.load ?? load;
-  const extensions = options.extensions ?? extensionsDefault;
-  return {
-    postcssPlugin: name$1,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    async OnceExit(css, {
-      result: res
-    }) {
-      if (!css.source?.input.file) return;
-      const opts = {
-        ...res.opts
-      };
-      delete opts.map;
-      const {
-        icssImports,
-        icssExports
-      } = icssUtils.extractICSS(css);
-      const imports = await resolve(icssImports, load$1, css.source.input.file, extensions, res.processor, opts);
-      icssUtils.replaceSymbols(css, imports);
-      for (const [k, v] of Object.entries(icssExports)) {
-        res.messages.push({
-          plugin: name$1,
-          type: "icss",
-          export: {
-            [k]: icssUtils.replaceValueSymbols(v, imports)
-          }
-        });
-      }
-    }
-  };
-};
-plugin$1.postcss = true;
-
-const name = "styles-noop";
-const plugin = () => ({
-  postcssPlugin: name
-});
 plugin.postcss = true;
 
 const baseDir = path.dirname(node_url.fileURLToPath((typeof document === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('index.cjs', document.baseURI).href))));
@@ -822,7 +896,7 @@ function ensureAutoModules(am, id) {
   if (am instanceof RegExp) return am.test(id);
   return am && /\.module\.[A-Za-z]+$/.test(id);
 }
-const loader$4 = {
+const loader$3 = {
   name: "postcss",
   alwaysProcess: true,
   async process({
@@ -851,11 +925,11 @@ const loader$4 = {
       }
     };
     delete postcssOpts.plugins;
-    if (options.import) plugins.push(plugin$3({
+    if (options.import) plugins.push(plugin$2({
       extensions: options.extensions,
       ...options.import
     }));
-    if (options.url) plugins.push(plugin$2({
+    if (options.url) plugins.push(plugin({
       inline: Boolean(options.inject),
       ...options.url
     }));
@@ -867,7 +941,7 @@ const loader$4 = {
         generateScopedName: undefined,
         failOnWrongOrder: true,
         ...modulesOptions
-      }), plugin$1({
+      }), plugin$3({
         extensions: options.extensions
       }));
     }
@@ -876,7 +950,7 @@ const loader$4 = {
       plugins.push(cssnano(cssnanoOpts));
     }
     // Avoid PostCSS warning
-    if (plugins.length === 0) plugins.push(plugin);
+    if (plugins.length === 0) plugins.push(plugin$1);
     const res = await postcss(plugins).process(code, postcssOpts);
     for (const msg of res.messages) switch (msg.type) {
       case "warning":
@@ -916,7 +990,7 @@ const loader$4 = {
     };
     const saferId = id => safeId(id, path.basename(this.id));
     const modulesVarName = saferId("modules");
-    const output = options.inject ? [`export var ${cssVarName} = ${JSON.stringify(res.css)};`] : [];
+    const output = [`export var ${cssVarName} = ${JSON.stringify(res.css)};`];
     const dts = [`export var ${cssVarName}: string;`];
     if (options.namedExports) {
       const getClassName = typeof options.namedExports === "function" ? options.namedExports : getClassNameDefault;
@@ -968,14 +1042,15 @@ const loader$4 = {
           output.push(`var ${modulesVarName} = {${getters}};`);
         }
       }
-      const defaultExport = `export default ${supportModules ? modulesVarName : cssVarName};`;
-      output.push(defaultExport);
-      if (options.dts && (await fs.pathExists(this.id))) {
-        if (supportModules) dts.push(`interface ModulesExports ${JSON.stringify(modulesExports)}`, typeof options.inject === "object" && options.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "", `declare const ${modulesVarName}: ModulesExports;`);
-        dts.push(defaultExport);
-        await fs.writeFile(`${this.id}.d.ts`, dts.filter(Boolean).join("\n"));
-      }
-    } //else output.push(`var ${modulesVarName} = ${JSON.stringify(modulesExports)};`);
+    }
+    if (!options.inject) output.push(`var ${modulesVarName} = ${JSON.stringify(modulesExports)};`);
+    const defaultExport = `export default ${supportModules ? modulesVarName : cssVarName};`;
+    output.push(defaultExport);
+    if (options.dts && (await fs.pathExists(this.id))) {
+      if (supportModules) dts.push(`interface ModulesExports ${JSON.stringify(modulesExports)}`, typeof options.inject === "object" && options.inject.treeshakeable ? `interface ModulesExports {inject:()=>void}` : "", `declare const ${modulesVarName}: ModulesExports;`);
+      dts.push(defaultExport);
+      await fs.writeFile(`${this.id}.d.ts`, dts.filter(Boolean).join("\n"));
+    }
     return {
       code: output.filter(Boolean).join("\n"),
       map,
@@ -984,18 +1059,60 @@ const loader$4 = {
   }
 };
 
-const loader$3 = {
-  name: "sourcemap",
-  alwaysProcess: true,
-  async process({
-    code,
-    map
-  }) {
-    map = (await getMap(code, this.id)) ?? map;
-    return {
-      code: stripMap(code),
-      map
+const extensions = [".scss", ".sass", ".css"];
+const conditions = ["sass", "style"];
+const importer = {
+  async findFileUrl(url, context) {
+    if (!isModule(url)) {
+      return null;
+    }
+    const moduleUrl = normalizeUrl(url);
+    const partialUrl = getUrlOfPartial(moduleUrl);
+    const options = {
+      caller: "Sass importer",
+      basedirs: [path.dirname(context.containingUrl?.pathname ?? "./")],
+      extensions,
+      packageFilter: packageFilterBuilder({
+        conditions
+      })
     };
+    // Give precedence to importing a partial
+    try {
+      const resolved = await resolveAsync([partialUrl, moduleUrl], options);
+      if (!resolved) {
+        return null;
+      }
+      return node_url.pathToFileURL(resolved.replace(/\.css$/i, ""));
+    } catch {
+      return null;
+    }
+  }
+};
+const importerSync = {
+  findFileUrl(url, context) {
+    if (!isModule(url)) {
+      return null;
+    }
+    const moduleUrl = normalizeUrl(url);
+    const partialUrl = getUrlOfPartial(moduleUrl);
+    const options = {
+      caller: "Sass importer",
+      basedirs: [path.dirname(context.containingUrl?.pathname ?? "./")],
+      extensions,
+      packageFilter: packageFilterBuilder({
+        conditions
+      })
+    };
+    // Give precedence to importing a partial
+    try {
+      const resolved = resolveSync([partialUrl, moduleUrl], options);
+      if (!resolved) {
+        return null;
+      }
+      return node_url.pathToFileURL(resolved.replace(/\.css$/i, ""));
+    } catch {
+      return null;
+    }
   }
 };
 
@@ -1023,77 +1140,6 @@ async function loadSass (impl) {
   throw new Error(`You need to install ${idsFmt} package in order to process Sass files`);
 }
 
-const isModule = url => /^~[\d@A-Za-z]/.test(url);
-function getUrlOfPartial(url) {
-  const {
-    dir,
-    base
-  } = path.parse(url);
-  return dir ? `${normalizePath(dir)}/_${base}` : `_${base}`;
-}
-function normalizeUrl(url) {
-  if (isModule(url)) return normalizePath(url.slice(1));
-  if (isAbsolutePath(url) || isRelativePath(url)) return normalizePath(url);
-  return `./${normalizePath(url)}`;
-}
-
-const extensions$1 = [".scss", ".sass", ".css"];
-const conditions = ["sass", "style"];
-const importer$1 = {
-  async findFileUrl(url, context) {
-    if (!isModule(url)) {
-      return null;
-    }
-    const moduleUrl = normalizeUrl(url);
-    const partialUrl = getUrlOfPartial(moduleUrl);
-    const options = {
-      caller: "Sass importer",
-      basedirs: [path.dirname(context.containingUrl?.pathname ?? "./")],
-      extensions: extensions$1,
-      packageFilter: packageFilterBuilder({
-        conditions
-      })
-    };
-    // Give precedence to importing a partial
-    try {
-      const resolved = await resolveAsync([partialUrl, moduleUrl], options);
-      if (!resolved) {
-        return null;
-      }
-      return node_url.pathToFileURL(resolved.replace(/\.css$/i, ""));
-    } catch {
-      return null;
-    }
-  }
-};
-const importerSync = {
-  findFileUrl(url, context) {
-    if (!isModule(url)) {
-      return null;
-    }
-    const moduleUrl = normalizeUrl(url);
-    const partialUrl = getUrlOfPartial(moduleUrl);
-    const options = {
-      caller: "Sass importer",
-      basedirs: [path.dirname(context.containingUrl?.pathname ?? "./")],
-      extensions: extensions$1,
-      packageFilter: packageFilterBuilder({
-        conditions
-      })
-    };
-    // Give precedence to importing a partial
-    try {
-      const resolved = resolveSync([partialUrl, moduleUrl], options);
-      if (!resolved) {
-        return null;
-      }
-      return node_url.pathToFileURL(resolved.replace(/\.css$/i, ""));
-    } catch {
-      return null;
-    }
-  }
-};
-
 const loader$2 = {
   name: "sass",
   test: /\.(sass|scss)$/i,
@@ -1104,10 +1150,13 @@ const loader$2 = {
     const options = {
       ...this.options
     };
-    const [sass, type] = await loadSass(options.impl);
-    const sync = options.sync ?? type !== "node-sass";
-    const importers = [sync ? importerSync : importer$1];
-    if (options.importers) importers.push(...options.importers);
+    const [sass] = await loadSass(options.impl);
+    const sync = options.sync ?? false;
+    const importers = [];
+    if (options.importers) {
+      importers.push(...options.importers);
+    }
+    importers.push(sync ? importerSync : importer);
     const render = async options => {
       return sync ? new Promise(resolve => resolve(sass.compileString(code, options))) : sass.compileStringAsync(code, options);
     };
@@ -1119,10 +1168,10 @@ const loader$2 = {
       url: node_url.pathToFileURL(this.id),
       syntax: /\.sass$/i.test(this.id) ? "indented" : "scss",
       sourceMap: true,
-      sourceMapIncludeSources: true,
+      sourceMapIncludeSources: options.sourceMapIncludeSources ?? true,
       importers: importers
     });
-    const deps = res.loadedUrls.map(u => node_url.fileURLToPath(u));
+    const deps = res.loadedUrls.filter(u => u.protocol === "file").map(u => node_url.fileURLToPath(u));
     for (const dep of deps) this.deps.add(normalizePath(dep));
     if (res.sourceMap) {
       res.sourceMap.sources = res.sourceMap.sources.map(s => s.startsWith("file:///") ? node_url.fileURLToPath(s) : s);
@@ -1135,6 +1184,21 @@ const loader$2 = {
 };
 
 const loader$1 = {
+  name: "sourcemap",
+  alwaysProcess: true,
+  async process({
+    code,
+    map
+  }) {
+    map = (await getMap(code, this.id)) ?? map;
+    return {
+      code: stripMap(code),
+      map
+    };
+  }
+};
+
+const loader = {
   name: "stylus",
   test: /\.(styl|stylus)$/i,
   async process({
@@ -1177,67 +1241,6 @@ const loader$1 = {
   }
 };
 
-const extensions = [".less", ".css"];
-const getStylesFileManager = less => new class extends less.FileManager {
-  supports() {
-    return true;
-  }
-  async loadFile(filename, filedir, opts) {
-    const url = normalizeUrl(filename);
-    const partialUrl = getUrlOfPartial(url);
-    const options = {
-      caller: "Less importer",
-      basedirs: [filedir],
-      extensions
-    };
-    if (opts.paths) options.basedirs.push(...opts.paths);
-    // Give precedence to importing a partial
-    const id = await resolveAsync([partialUrl, url], options);
-    return {
-      filename: id,
-      contents: await fs.readFile(id, "utf8")
-    };
-  }
-}();
-const importer = {
-  install(less, pluginManager) {
-    pluginManager.addFileManager(getStylesFileManager(less));
-  }
-};
-
-const loader = {
-  name: "less",
-  test: /\.less$/i,
-  async process({
-    code,
-    map
-  }) {
-    const options = {
-      ...this.options
-    };
-    const less = await import('less').then(m => m.default);
-    if (!less) throw new Error("You need to install `less` package in order to process Less files");
-    const plugins = [importer];
-    if (options.plugins) plugins.push(...options.plugins);
-    const res = await less.render(code, {
-      ...options,
-      plugins,
-      filename: this.id,
-      sourceMap: {
-        outputSourceFiles: true,
-        sourceMapBasepath: path.dirname(this.id),
-        disableSourcemapAnnotation: true
-      }
-    });
-    const deps = res.imports;
-    for (const dep of deps) this.deps.add(normalizePath(dep));
-    return {
-      code: res.css,
-      map: res.map ?? map
-    };
-  }
-};
-
 function matchFile(file, condition) {
   if (!condition) return false;
   if (typeof condition === "function") return condition(file);
@@ -1246,7 +1249,7 @@ function matchFile(file, condition) {
 // This queue makes sure one thread is always available,
 // which is necessary for some cases
 // ex.: https://github.com/sass/node-sass/issues/857
-const threadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.env.UV_THREADPOOL_SIZE) : 4; // default `libuv` threadpool size
+const threadPoolSize = process.env.UV_THREADPOOL_SIZE ? Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10) : 4; // default `libuv` threadpool size
 class Loaders {
   use;
   test;
@@ -1255,8 +1258,8 @@ class Loaders {
   constructor(options) {
     this.use = new Map(options.use.reverse());
     this.test = file => options.extensions.some(ext => file.toLowerCase().endsWith(ext));
-    this.add(loader$4);
-    this.add(loader$3, loader$2, loader, loader$1);
+    this.add(loader$3);
+    this.add(loader$1, loader$2, loader$4, loader);
     if (options.loaders) this.add(...options.loaders);
   }
   add(...loaders) {
@@ -1375,15 +1378,6 @@ var index = (options = {}) => {
       if (!isIncluded(id) || !loaders.isSupported(id)) return null;
       // Skip empty files
       if (code.replaceAll(/\s/g, "") === "") return null;
-      // Check if file was already processed into JS
-      // by other instance(s) of this or other plugin(s)
-      try {
-        this.parse(code, {}); // If it doesn't throw...
-        this.warn(`Skipping processed file ${humanlizePath(id)}`);
-        return null;
-      } catch {
-        // Was not already processed, continuing
-      }
       if (typeof options.onImport === "function") options.onImport(code, id);
       const ctx = {
         id,
