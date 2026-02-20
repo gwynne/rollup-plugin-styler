@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import fs from "fs-extra";
 import { rollup } from "rollup";
-import { litCss } from "rollup-plugin-lit-css";
+import { litCss } from "../node_modules/rollup-plugin-lit-css/rollup-plugin-lit-css.js";
 import type { RawSourceMap } from "source-map-js";
 import styles from "../src/index.js";
 import { humanlizePath } from "../src/utils/path.js";
