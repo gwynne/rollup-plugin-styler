@@ -54,7 +54,7 @@ const loader: Loader<SASSLoaderOptions> = {
     });
 
     const deps = res.loadedUrls
-      .filter((u: URL) => u.protocol === "file")
+      .filter((u: URL) => u.protocol === "file:")
       .map(u => fileURLToPath(u));
     for (const dep of deps) this.deps.add(normalizePath(dep));
 
