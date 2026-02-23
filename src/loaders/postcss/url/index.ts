@@ -48,7 +48,7 @@ export interface UrlOptions {
    * Extensions should be specified without leading dots. Files whose extensions do not appear
    * in the mapping are placed directly in the assetDir.
    */
-  fileExtensionPathMappings?: Record<string, string>;
+  extensionMap?: Record<string, string>;
   /**
    * Provide custom resolver for URLs
    * in place of the default one
@@ -66,7 +66,7 @@ const plugin: PluginCreator<UrlOptions> = (options = {}) => {
   const inline = options.inline ?? false;
   const publicPath = options.publicPath ?? "./";
   const assetDir = options.assetDir ?? ".";
-  const fileExtMappings = options.fileExtensionPathMappings ?? {};
+  const fileExtMappings = options.extensionMap ?? {};
   const resolve = options.resolve ?? resolveDefault;
   const alias = options.alias ?? {};
   const placeholder =
