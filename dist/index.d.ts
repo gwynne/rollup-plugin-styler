@@ -185,7 +185,7 @@ interface UrlOptions {
      * Extensions should be specified without leading dots. Files whose extensions do not appear
      * in the mapping are placed directly in the assetDir.
      */
-    fileExtensionPathMappings?: Record<string, string>;
+    extensionMap?: Record<string, string>;
     /**
      * Provide custom resolver for URLs
      * in place of the default one
